@@ -186,47 +186,41 @@ was created). JSR's `meta.json` does list a `githubRepository` for these
 packages, so a connection exists on paper, but it did not fire in that test.
 Publishing is an external action, so it still needs approval.
 
-### Publication policy (this repository is public)
+### Keep this repository simple
 
-This repository was previously an internal launchpoint and is now a public one,
-recreated on 2026-10-10 as a single clean commit. Its predecessor,
-[`workspace-v1`](https://github.com/wazootech/workspace-v1), is archived and
-read-only; it retains everything described below and must never be unarchived,
-made public, or mirrored. Three classes of material accumulated while that
-history was private. None of them may be committed here again.
+This repository is public and was recreated on 2026-10-10 as a single clean
+commit. The version it replaced stopped being a harness because it accumulated
+files, and the rebuild only worked because nothing carried over. The rules below
+exist so that does not happen again.
 
-Never commit:
+- **Keep it simple.** This repository is a harness and a pointer. Anything with
+  content belongs in the repository that owns it; this one federates checkouts,
+  it does not document them.
+- **Add no files, ever.** Twelve tracked files is the ceiling, not a starting
+  point. A scratch note, agent transcript, runbook, secret inventory, run log,
+  design document, or generated report is not a candidate here. If one genuinely
+  seems needed, ask Ethan first and expect the answer to be a different
+  repository.
+- **Never add session-shaped material.** Agent transcripts, exported
+  conversation logs, captured command output, and environment dumps are
+  gitignored for that reason. An unfiltered log is how a private repository
+  becomes an unsafe public one.
+- **Secret-shaped material goes elsewhere.** Inventories, secret names, which
+  service needs which value, and infrastructure runbooks belong in the private
+  ops home: `wazootech/memory` for durable records, plus a private repository
+  for secrets-adjacent material. A value-free inventory is still the map worth
+  stealing.
+- **Say only what is true.** If `README.md` claims a control,
+  `.github/workflows/` holds it. `secret-scan.yml` exists so the claim about
+  scanning is real, and scanning and push protection are enabled on the
+  repository as the second line behind CI.
+- **Prefer deletion to accumulation.** Edits that shrink the tree are welcome.
 
-- **Agent session transcripts and exported conversation logs.** `session-*.md`
-  and `*.transcript.md` are gitignored; that rule is a boundary, not a
-  suggestion. A transcript is an unfiltered record of tool calls and environment
-  dumps. The 2026-08 transcripts (`session-ses_015e.md`, `session-ses_0162.md`,
-  `session-ses_016c.md`, added in `7475758`, removed from `main` in `9b22899`)
-  carried a live AI Gateway key and a Vercel OIDC token.
-- **Secret inventories, secret names, and credential topology.** A value-free
-  inventory is still sensitive: which service needs which secret, and which
-  manager holds it, is the map worth stealing.
-- **Infrastructure runbooks and deployment handoffs.** Infisical cutover steps,
-  Cloudflare and D1 reset procedures, machine-identity wiring, VPS composition,
-  and QA host patches belong in the private ops home.
-- **Anything that names a private repository in a load-bearing way.** A public
-  manifest whose `wspace install` cannot succeed is a broken entry point, not a
-  disclosure.
+Treat any repository meant for publication as public from its first commit, and
+scan it for secrets before the push that makes it public.
 
-The private ops home is `wazootech/memory` for durable records plus a private
-repository of your choosing for secrets-adjacent runbooks. Not this repository.
-
-Controls that exist because this section says so:
-
-- `.github/workflows/secret-scan.yml` runs gitleaks over full history on every
-  push and pull request. If `README.md` claims a control, the workflow must
-  exist; that drift is how a key sat in this history undetected for two months.
-- Secret scanning and push protection are enabled on the repository, which is
-  free for public repositories and is the second line behind CI.
-
-The two rules that would have prevented the 2026-08 incident: scan a repository
-for secrets before the push that makes it public, and treat every repository
-intended for publication as public from its first commit rather than its
-thousandth.
+The predecessor, [`workspace-v1`](https://github.com/wazootech/workspace-v1), is
+archived and read-only: history to consult if needed, never a source to copy
+back in.
 
 Public repositories in this family carry a `LICENSE` file and allow forking.
