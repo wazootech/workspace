@@ -188,9 +188,12 @@ Publishing is an external action, so it still needs approval.
 
 ### Publication policy (this repository is public)
 
-This repository was previously an internal launchpoint and is now a public one.
-Three classes of material accumulated while it was private. None of them may be
-committed here again.
+This repository was previously an internal launchpoint and is now a public one,
+recreated on 2026-10-10 as a single clean commit. Its predecessor,
+[`workspace-v1`](https://github.com/wazootech/workspace-v1), is archived and
+read-only; it retains everything described below and must never be unarchived,
+made public, or mirrored. Three classes of material accumulated while that
+history was private. None of them may be committed here again.
 
 Never commit:
 
