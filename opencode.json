@@ -1,0 +1,39 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "small_model": "opencode/x-preview-f-free",
+  "permission": {
+    "edit": {
+      "**/secrets/**": "deny"
+    }
+  },
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@1.7.0",
+        "--browser-url=http://127.0.0.1:9222"
+      ]
+    }
+  },
+  "watcher": {
+    "ignore": [
+      "repos/**/.git/**",
+      "repos/**/node_modules/**",
+      "repos/**/.next/**",
+      "repos/**/.open-next/**",
+      "repos/**/.wrangler/**",
+      "repos/**/dist/**",
+      "repos/**/build/**",
+      "repos/**/coverage/**",
+      "repos/**/.venv*/**",
+      "repos/**/_site/**",
+      "repos/**/__pycache__/**",
+      "repos/**/*.egg-info/**"
+    ]
+  }
+}

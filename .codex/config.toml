@@ -1,0 +1,14 @@
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "user"
+model_reasoning_effort = "medium"
+
+# Multi-repo workflow policy is defined in the parent AGENTS.md. Keep changes
+# atomic, verify each pushed commit in GitHub Actions, and leave every worktree
+# clean before handing work back.
+# OpenCode uses the same AGENTS.md via the project opencode.json file. Keep
+# shared behavior in AGENTS.md, not duplicated in tool-specific config.
+
+[agents]
+max_threads = 6
+max_depth = 1

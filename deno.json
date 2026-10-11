@@ -1,0 +1,19 @@
+{
+  "lock": false,
+  "tasks": {
+    "workspace:check": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli check",
+    "workspace:install": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli install",
+    "workspace:bootstrap": "deno task workspace:install",
+    "workspace:update": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli update",
+    "workspace:validate": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli validate"
+  },
+  "fmt": {
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "useTabs": false,
+    "exclude": [
+      "repos/",
+      "worktrees/"
+    ]
+  }
+}

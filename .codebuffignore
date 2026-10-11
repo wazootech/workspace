@@ -1,0 +1,3 @@
+# Un-ignore repos/ and worktrees/ so Codebuff/Freebuff can access nested checkout files
+!repos/
+!worktrees/

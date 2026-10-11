@@ -1,0 +1,25 @@
+# Local Codex and dev artifacts.
+/.codex/*
+!/.codex/config.toml
+.codex-*.log
+.env*
+/secrets/
+
+# Dependencies and generated output.
+/node_modules/
+
+# Temp files.
+/tmp/
+/scratch/
+/prior-art/
+
+# Local app data and scratch tooling.
+/.freebuff/
+/.opencode/
+/.wrangler/
+/audit-wazoo-terminology.py
+/REPO-MAP.md
+
+# Agent session transcripts and exported conversation logs.
+/session-*.md
+/*.transcript.md
