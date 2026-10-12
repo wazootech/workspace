@@ -75,8 +75,9 @@ files. Mechanical rules: skill files are named `SKILL.md` (exact casing); a
 skill's frontmatter `name:` equals its directory name; a directory directly
 under root `skills/` without the `wazootech_` prefix fails, as does a
 `wazootech_*` name anywhere outside root `skills/`; wiki-template payloads
-(`repos/wiki-templates/*/AGENTS.md`) — shipped content that doubles as live
-instructions in scaffolded sites — must carry their `template-payload` header.
+(`repos/wiki-templates/templates/*/AGENTS.md`) — shipped content that doubles as
+live instructions in scaffolded sites — must carry their `template-payload`
+header.
 
 ### Cross-repo changes (read before opening a PR that others depend on)
 
