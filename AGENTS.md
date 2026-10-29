@@ -187,6 +187,39 @@ was created). JSR's `meta.json` does list a `githubRepository` for these
 packages, so a connection exists on paper, but it did not fire in that test.
 Publishing is an external action, so it still needs approval.
 
+### Code-health standards
+
+Every repo in this family follows these rules, and each repo's `AGENTS.md` links
+here for the canonical statement. CI enforces what a tool can check; the rest is
+review discipline.
+
+- **Gates.** Format, lint, and typecheck run on every pull request and push to
+  `main` and must pass. Strict typing is on. No `any` and no `@ts-ignore`: use
+  `unknown` and narrow it, or `@ts-expect-error <reason>`. A lint disable needs
+  a reason on the same line.
+- **File size.** At most 120 lines of code per file (300 for tests), counting
+  neither blank, comment, nor import lines. Generated, vendored, schema,
+  snapshot, and fixture files are exempt. The check (`code-health.yml`) is
+  warn-only while existing files are split; never add a new violation, and split
+  a file when you touch it. Function limits worth holding in review: about 40
+  lines, complexity 10, nesting 3, four parameters.
+- **TODOs.** A `TODO` or `FIXME` links an issue.
+- **Supply chain.** Pin third-party workflow actions to a full commit SHA with a
+  `# vX.Y.Z` comment, pin toolchains exactly (`deno-version`, `.node-version`),
+  and install from the lockfile frozen. Renovate proposes bumps; do not hand-edit
+  pins to float.
+- **Secrets.** `secret-scan.yml` (gitleaks, pinned and checksummed) runs on every
+  pull request. A real finding is fixed and rotated, never allowlisted. Only a
+  verified false positive gets an exact-fingerprint `.gitleaksignore` line, with
+  no regex allowlists and no rule disables. Never print a flagged value.
+- **Changes.** Keep pull requests under about 400 changed lines or say why. A
+  change to an OpenAPI schema, a client's types, a route contract, or a shared
+  identifier lists its downstream dependents, the merge order, and what could not
+  be observed (see Cross-repo changes). Coverage floors only rise: raise them in
+  the PR that earns it, never lower one without a named exemption.
+- **Ownership.** Every repo has `.github/CODEOWNERS` and a README with its owner,
+  purpose, and the one command that sets up, builds, and tests it.
+
 ### Keep this repository simple
 
 This repository is public and was recreated on 2026-10-10 as a single clean
