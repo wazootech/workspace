@@ -206,19 +206,20 @@ review discipline.
 - **TODOs.** A `TODO` or `FIXME` links an issue.
 - **Supply chain.** Pin third-party workflow actions to a full commit SHA with a
   `# vX.Y.Z` comment, pin toolchains exactly (`deno-version`, `.node-version`),
-  and install from the lockfile frozen. Renovate proposes bumps; do not hand-edit
-  pins to float.
-- **Secrets.** `secret-scan.yml` (gitleaks, pinned and checksummed) runs on every
-  pull request. A real finding is fixed and rotated, never allowlisted. Only a
-  verified false positive gets an exact-fingerprint `.gitleaksignore` line, with
-  no regex allowlists and no rule disables. Never print a flagged value.
+  and install from the lockfile frozen. Renovate proposes bumps; do not
+  hand-edit pins to float.
+- **Secrets.** `secret-scan.yml` (gitleaks, pinned and checksummed) runs on
+  every pull request. A real finding is fixed and rotated, never allowlisted.
+  Only a verified false positive gets an exact-fingerprint `.gitleaksignore`
+  line, with no regex allowlists and no rule disables. Never print a flagged
+  value.
 - **Changes.** Keep pull requests under about 400 changed lines or say why. A
   change to an OpenAPI schema, a client's types, a route contract, or a shared
-  identifier lists its downstream dependents, the merge order, and what could not
-  be observed (see Cross-repo changes). Coverage floors only rise: raise them in
-  the PR that earns it, never lower one without a named exemption.
-- **Ownership.** Every repo has `.github/CODEOWNERS` and a README with its owner,
-  purpose, and the one command that sets up, builds, and tests it.
+  identifier lists its downstream dependents, the merge order, and what could
+  not be observed (see Cross-repo changes). Coverage floors only rise: raise
+  them in the PR that earns it, never lower one without a named exemption.
+- **Ownership.** Every repo has `.github/CODEOWNERS` and a README with its
+  owner, purpose, and the one command that sets up, builds, and tests it.
 
 ### Keep this repository simple
 
