@@ -4,6 +4,7 @@
   "repositoriesDirectory": "repos",
   "repositories": [
     ".github",
+    "blog.wazoo.dev",
     "docs.wazoo.dev",
     "linked-markdown",
     "linked-markdown-py",
