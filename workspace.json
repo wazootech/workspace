@@ -20,6 +20,7 @@
     "wazoo-cli",
     "wazoo-console",
     "wazoo-tools",
+    "wazoo-voice-agent",
     "wazoo-skills",
     "wazoo.dev",
     "memory",
