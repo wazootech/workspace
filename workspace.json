@@ -41,6 +41,7 @@
     "sparql-engine",
     "reasoner",
     "wazoo-memorybench",
+    "wazoobench",
     "computer",
     "computer-agent",
     "data",
