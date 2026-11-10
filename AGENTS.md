@@ -26,8 +26,8 @@ Do not duplicate child repo guidance here. Route to local docs and source code:
     `wspace check --json` over ad-hoc per-repo `ls`/`git status` probes.
   - **Triage outputs before finishing**: when `wspace check` reports a checkout
     DIRTY, or after you touch one, run `git status` there to see the paths.
-    Commit intended work, add a precise ignore rule for local-only artifacts,
-    or delete disposables in the same session. A recurring output class gets an
+    Commit intended work, add a precise ignore rule for local-only artifacts, or
+    delete disposables in the same session. A recurring output class gets an
     ignore rule, not a reminder.
   - **Root checkout coverage**: `check` and `update` include the workspace root
     checkout itself (reported as `(workspace root)`), so a stale federation repo
