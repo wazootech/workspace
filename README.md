@@ -22,36 +22,6 @@ deno add jsr:@wazoo/workspace
 npx jsr add @wazoo/workspace
 ```
 
-### CDN (browser / no build step)
-
-[esm.sh](https://esm.sh) serves JSR packages as ES modules — no install, no
-bundler needed.
-
-```js
-import { ... } from "https://esm.sh/jsr/@wazoo/workspace@0.6.0";
-```
-
-With an import map:
-
-```html
-<script type="importmap">
-{
-  "imports": {
-    "@wazoo/workspace": "https://esm.sh/jsr/@wazoo/workspace@0.6.0"
-  }
-}
-</script>
-<script type="module">
-  import { ... } from "@wazoo/workspace";
-</script>
-```
-
-Pin to an exact build for deterministic caching:
-
-```js
-import { ... } from "https://esm.sh/jsr/@wazoo/workspace@0.6.0?pin=v1724100000";
-```
-
 ## Commands
 
 ```sh
