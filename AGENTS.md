@@ -134,9 +134,12 @@ $wrk = Join-Path $WORKSPACE_ROOT "worktrees/$repo/$feature"
 git -C (Join-Path $WORKSPACE_ROOT "repos/$repo") worktree add $wrk -b $feature
 ```
 
-Use `git worktree list`, `git worktree remove`, and `git worktree prune` for
-inspection and cleanup. Keep the chosen worktree path consistent with the child
-repository's local instructions.
+Use `git worktree list` for inspection. After a PR merges, clean up with
+`wspace sweep --dry-run`, then `wspace sweep` (add `--delete-remote` to drop
+`origin/<branch>`). It removes every merged linked worktree workspace-wide and
+purges directories that `git worktree remove` cannot, such as long paths on
+Windows. Raw `git worktree remove` and `git worktree prune` still work. Keep the
+chosen worktree path consistent with the child repository's local instructions.
 
 ### Local secrets
 
