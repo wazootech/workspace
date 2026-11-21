@@ -52,10 +52,10 @@ create a worktree first — regardless of what the child repo's docs say.
   repository is archived; an archived repo is not a dependency anyone should
   clone, and the manifest is read as a dependency list.
 - An entry must be readable by whoever checks this workspace out. `memory`,
-  `memsdk-e2e`, and `computer` are private and named deliberately, so a reader
-  without org access gets a partial `wspace install` rather than a full one. Say
-  so where the install is documented instead of letting it fail one repo at a
-  time.
+  `memsdk-e2e`, `computer`, `data`, and `dude` are private and named
+  deliberately, so a reader without org access gets a partial `wspace install`
+  rather than a full one. Say so where the install is documented instead of
+  letting it fail one repo at a time.
 
 ### Agent-file classes
 
