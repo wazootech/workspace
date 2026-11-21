@@ -12,11 +12,14 @@ Do not duplicate child repo guidance here. Route to local docs and source code:
 
 - **Company brain**: [`repos/memory`](repos/memory) is the org's brain of record
   — the durable, typed record of how Wazoo operates and what it knows, validated
-  by the wiki CLI and canonical at `memory.wazoo.dev`. GitHub issues, pull
+  by the wiki CLI and served from a private deployment; GitHub issues, pull
   requests, and boards stay the source of truth for work state; the brain holds
-  the context those items link. The former `wazoopedia` repository was archived
-  and renamed to `memory`, so a surviving `wazoopedia` reference is stale —
-  route it to `repos/memory` rather than reviving the old repo.
+  the context those items link. (A public hosted URL for the brain is deferred
+  until the wiki ships its opt-in web sign-in, per
+  [wiki#48](https://github.com/wazootech/wiki/issues/48); do not reference a
+  hosted brain URL until that lands.) The former `wazoopedia` repository was
+  archived and renamed to `memory`, so a surviving `wazoopedia` reference is
+  stale — route it to `repos/memory` rather than reviving the old repo.
 - **Workspace CLI**: For workspace CLI usage and task execution, see
   [`repos/workspace-cli/skills/wspace/SKILL.md`](repos/workspace-cli/skills/wspace/SKILL.md)
   and [`workspace-cli`](repos/workspace-cli).
