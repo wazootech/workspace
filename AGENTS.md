@@ -220,7 +220,10 @@ review discipline.
 - **Supply chain.** Pin third-party workflow actions to a full commit SHA with a
   `# vX.Y.Z` comment, pin toolchains exactly (`deno-version`, `.node-version`),
   and install from the lockfile frozen. Renovate proposes bumps; do not
-  hand-edit pins to float.
+  hand-edit pins to float. The one exception is Bun: workflows set
+  `bun-version: "1.x"` so Bun regressions surface early while it develops (owner
+  decision 2026-11-23, wazootech/workspace#50). `bun fmt` and `bun check` need
+  Bun 1.4.5 or newer, which `1.x` satisfies.
 - **Secrets.** `secret-scan.yml` (gitleaks, pinned and checksummed) runs on
   every pull request. A real finding is fixed and rotated, never allowlisted.
   Only a verified false positive gets an exact-fingerprint `.gitleaksignore`
@@ -244,11 +247,12 @@ exist so that does not happen again.
 - **Keep it simple.** This repository is a harness and a pointer. Anything with
   content belongs in the repository that owns it; this one federates checkouts,
   it does not document them.
-- **Add no files, ever.** Twelve tracked files is the ceiling, not a starting
-  point. A scratch note, agent transcript, runbook, secret inventory, run log,
-  design document, or generated report is not a candidate here. If one genuinely
-  seems needed, ask Ethan first and expect the answer to be a different
-  repository.
+- **Add only what the harness needs.** There is no fixed file-count ceiling (the
+  old twelve-file cap was lifted on 2026-11-23); a small script that checks or
+  federates checkouts earns its place, such as `scripts/check-manifests.ts`. A
+  scratch note, agent transcript, runbook, secret inventory, run log, design
+  document, or generated report is still not a candidate here and belongs in the
+  repository that owns it.
 - **Never add session-shaped material.** Agent transcripts, exported
   conversation logs, captured command output, and environment dumps are
   gitignored for that reason. An unfiltered log is how a private repository
