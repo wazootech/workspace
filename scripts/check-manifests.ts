@@ -2,14 +2,18 @@
  * check-manifests keeps package.json (what Bun installs and tests against) in
  * lockstep with jsr.json (what `jsr publish` ships): the same export map and
  * the same dependency ranges, with each `jsr:` dependency spelled as its
- * `npm:@jsr/<scope>__<name>` alias in package.json.
+ * `npm:@jsr/<scope>__<name>` alias in package.json. Every jsr.json import must
+ * be a package.json dependency or devDependency; every package.json
+ * dependency (not devDependency) must be a jsr.json import.
  *
  * Usage: `bun scripts/check-manifests.ts [repoDir]` (defaults to the current
  * directory). Temporary home: copy it into a repo's `scripts/` until it moves
- * into workspace-cli (see wazootech/workspace#50).
+ * into workspace-cli (see wazootech/workspace#50). Handles devDependencies and
+ * an npm alias whose key differs from the package name.
  */
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import process from "node:process";
 
 const dir = resolve(process.argv[2] ?? ".");
 const read = (name: string) =>
@@ -17,6 +21,7 @@ const read = (name: string) =>
     exports?: unknown;
     imports?: Record<string, string>;
     dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
   };
 const jsr = read("jsr.json");
 const pkg = read("package.json");
@@ -25,9 +30,12 @@ const problems: string[] = [];
 const fail = (message: string) => problems.push(message);
 
 /** expectedPackageSpec maps a jsr.json import specifier to package.json's. */
-function expectedPackageSpec(spec: string): string {
+function expectedPackageSpec(alias: string, spec: string): string {
   if (spec.startsWith("npm:")) {
-    return spec.slice("npm:".length).replace(/^.+?@/, "");
+    const body = spec.slice("npm:".length);
+    const split = body.lastIndexOf("@");
+    // An alias key that differs from the package name keeps its npm: prefix.
+    return body.slice(0, split) === alias ? body.slice(split + 1) : spec;
   }
   const [, scope, name, range] = /^jsr:@([^/]+)\/([^@]+)@(.+)$/.exec(spec) ??
     [];
@@ -39,13 +47,15 @@ if (JSON.stringify(jsr.exports) !== JSON.stringify(pkg.exports)) {
 }
 
 const deps = pkg.dependencies ?? {};
+const devDeps = pkg.devDependencies ?? {};
 const imports = jsr.imports ?? {};
 for (const [alias, spec] of Object.entries(imports)) {
   if (alias === "@/") continue;
-  if (!(alias in deps)) {
+  const declared = deps[alias] ?? devDeps[alias];
+  if (declared === undefined) {
     fail(`jsr.json imports "${alias}" but package.json does not depend on it`);
-  } else if (deps[alias] !== expectedPackageSpec(spec)) {
-    fail(`"${alias}": jsr.json ${spec} vs package.json ${deps[alias]}`);
+  } else if (declared !== expectedPackageSpec(alias, spec)) {
+    fail(`"${alias}": jsr.json ${spec} vs package.json ${declared}`);
   }
 }
 for (const alias of Object.keys(deps)) {
