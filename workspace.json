@@ -37,6 +37,7 @@
     "worlds-postgres",
     "worlds-sqlite",
     "workspace-cli",
+    "stream",
     "sparql-engine",
     "reasoner",
     "wazoo-memorybench",
