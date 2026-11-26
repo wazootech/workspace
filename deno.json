@@ -6,8 +6,8 @@
     "workspace:bootstrap": "deno task workspace:install",
     "workspace:update": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli update",
     "workspace:validate": "deno run --min-dep-age 0 --allow-read --allow-write --allow-run=git jsr:@wazoo/workspace@0.6.0/cli validate",
-    "balls:collect": "deno run --allow-run=gh --allow-env .agents/skills/wz_balls/scripts/collect.ts",
-    "balls:test": "deno test .agents/skills/wz_balls/scripts"
+    "balls:collect": "deno run --allow-run=gh --allow-env .agents/skills/balls/scripts/collect.ts",
+    "balls:test": "deno test .agents/skills/balls/scripts"
   },
   "fmt": {
     "lineWidth": 80,

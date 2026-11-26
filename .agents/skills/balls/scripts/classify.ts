@@ -7,9 +7,11 @@ import {
   requestedBy,
   suppressed,
 } from "./signals.ts";
-import type { Ball, Item, Move } from "./types.ts";
+import { MOVES } from "./types.ts";
+import type { Ball, Item } from "./types.ts";
 
-const ORDER: Move[] = ["Fix", "Reply", "Review", "Merge"];
+// Short enough to skim a shortlist, long enough to see what was asked.
+const EVIDENCE_CHARS = 200;
 
 export function classify(item: Item, viewer: string): Ball | null {
   if (
@@ -54,7 +56,7 @@ export function classify(item: Item, viewer: string): Ball | null {
   const review = isPr && asked && !viewerAuthor;
   const merge = isPr && viewerAuthor && approvals && !changes && green;
 
-  const moves = ORDER.filter((m) =>
+  const moves = MOVES.filter((m) =>
     (m === "Fix" && fix) || (m === "Reply" && reply) ||
     (m === "Review" && review) || (m === "Merge" && merge)
   );
@@ -72,6 +74,6 @@ export function classify(item: Item, viewer: string): Ball | null {
     who: last?.author ??
       (assigned ? "assignment" : asked ? "review request" : "you"),
     since: last?.createdAt ?? item.updatedAt,
-    evidence: (last?.body ?? "").replace(/\s+/g, " ").slice(0, 200),
+    evidence: (last?.body ?? "").replace(/\s+/g, " ").slice(0, EVIDENCE_CHARS),
   };
 }

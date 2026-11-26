@@ -1,5 +1,5 @@
 /**
- * wz_balls collector. Read-only: GitHub GraphQL search plus REST thread reads,
+ * balls collector. Read-only: GitHub GraphQL search plus REST thread reads,
  * JSON on stdout, no writes and no cache file.
  *
  * Usage: collect.ts [owner|owner/repo]
@@ -8,9 +8,11 @@
 import { classify } from "./classify.ts";
 import { detail } from "./detail.ts";
 import { searchAll, viewer } from "./gh.ts";
-import type { Ball, Item } from "./types.ts";
+import { MOVES } from "./types.ts";
+import type { Ball, Item, Move } from "./types.ts";
 
-const PRIORITY = ["Fix", "Reply", "Review", "Merge"];
+// GitHub returns 100 items per page; 10 pages caps each search at 1000 items.
+const MAX_PAGES = 10;
 
 async function main(): Promise<void> {
   const args = Deno.args;
@@ -36,7 +38,7 @@ async function main(): Promise<void> {
   let pages = 0;
   let truncated = false;
   for (const search of searches) {
-    const result = await searchAll(search, 10);
+    const result = await searchAll(search, MAX_PAGES);
     pages += result.pages;
     truncated ||= result.truncated;
     for (const item of result.items) {
@@ -63,11 +65,13 @@ async function main(): Promise<void> {
     }
   }
   balls.sort((a, b) =>
-    PRIORITY.indexOf(a.move) - PRIORITY.indexOf(b.move) ||
+    MOVES.indexOf(a.move) - MOVES.indexOf(b.move) ||
     a.since.localeCompare(b.since)
   );
 
-  const counts = { Fix: 0, Reply: 0, Review: 0, Merge: 0 };
+  const counts = Object.fromEntries(
+    MOVES.map((move) => [move, 0]),
+  ) as Record<Move, number>;
   for (const ball of balls) counts[ball.move]++;
   console.log(JSON.stringify(
     {

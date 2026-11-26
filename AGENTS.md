@@ -85,8 +85,8 @@ files. Mechanical rules: skill files are named `SKILL.md` (exact casing); a
 skill's frontmatter `name:` equals its directory name; a directory directly
 under root `.agents/skills/` without the `wz_` prefix fails, as does a `wz_`
 name anywhere outside `.agents/skills/` (except the `.claude/skills/` symlink
-that points into it). `wz_balls` is an accepted exception to the Agent Skills
-kebab-case naming rule: OpenCode and Codex load it as-is. Wiki-template payloads
+that points into it). The `balls` skill is a one-off prefix-less exception:
+OpenCode, Codex, and Claude Code load it as-is. Wiki-template payloads
 (`repos/wiki-templates/templates/*/AGENTS.md`) — shipped content that doubles as
 live instructions in scaffolded sites — must carry their `template-payload`
 header.

@@ -62,6 +62,9 @@ export interface SearchPage {
 
 export type Move = "Fix" | "Reply" | "Review" | "Merge";
 
+/** Single source of truth for precedence and counts; mirrored in SKILL.md. */
+export const MOVES: Move[] = ["Fix", "Reply", "Review", "Merge"];
+
 export interface Ball {
   key: string;
   kind: "issue" | "pr";

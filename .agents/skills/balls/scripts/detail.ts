@@ -56,8 +56,11 @@ export async function detail(key: string): Promise<Detail> {
       "api",
       `repos/${repo}/pulls/${number}/comments?per_page=100`,
     ]) as RestComment[];
-  } catch {
-    // Issues do not have pull request endpoints; the first two calls stand.
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    // Issues have no pull-request endpoints; auth and rate-limit failures must
+    // surface instead of yielding a silently incomplete thread.
+    if (!/not found|404/i.test(message)) throw error;
   }
   return {
     key,

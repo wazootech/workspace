@@ -1,6 +1,10 @@
 /**
  * One compact search page: enough metadata to classify an item without paying
  * for every comment in the org. `--detail` loads the whole thread separately.
+ *
+ * `first: 100` is GitHub's page maximum. The `last: 5` and `first: 10` caps
+ * bound each candidate; `users(first: 10)` is enough to spot a viewer reaction
+ * without pulling every reactor.
  */
 export const SEARCH_QUERY = `
 query Balls($search: String!, $after: String) {

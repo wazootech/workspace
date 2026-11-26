@@ -8,6 +8,10 @@ export interface Activity {
   state?: string;
 }
 
+// Filters read message content, not account names: an agent can post a real ask
+// and a human can post a CI status line. Short automated chatter is noise;
+// longer text may carry a request and is left for the classifier.
+const NOISE_MAX_CHARS = 240;
 const NOISE =
   /\b(ci|all checks|checks (passed|failed)|build (passed|failed)|deploy(ed|ment)?|preview|dependabot|renovate|bump \S+ from \S+ to \S+)\b/i;
 const ASK =
@@ -15,7 +19,8 @@ const ASK =
 
 export function isNoise(body: string): boolean {
   const text = body.trim();
-  return text.length === 0 || (text.length < 240 && NOISE.test(text));
+  return text.length === 0 ||
+    (text.length < NOISE_MAX_CHARS && NOISE.test(text));
 }
 
 export function needsReply(body: string, viewer: string): boolean {

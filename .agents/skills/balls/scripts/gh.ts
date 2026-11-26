@@ -13,14 +13,21 @@ async function run(args: string[], input?: string): Promise<string> {
     stderr: "piped",
   });
   let output: Deno.CommandOutput;
-  if (input === undefined) {
-    output = await cmd.output();
-  } else {
-    const child = cmd.spawn();
-    const writer = child.stdin.getWriter();
-    await writer.write(new TextEncoder().encode(input));
-    await writer.close();
-    output = await child.output();
+  try {
+    if (input === undefined) {
+      output = await cmd.output();
+    } else {
+      const child = cmd.spawn();
+      const writer = child.stdin.getWriter();
+      await writer.write(new TextEncoder().encode(input));
+      await writer.close();
+      output = await child.output();
+    }
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Could not run gh (install and authenticate it first): ${detail}`,
+    );
   }
   if (output.code !== 0) {
     throw new Error(
@@ -68,7 +75,20 @@ export async function searchAll(
     }
     args.push("-F", "query=@-");
     const text = await run(args, SEARCH_QUERY);
-    const result = JSON.parse(text) as { data: { search: SearchPage } };
+    const result = JSON.parse(text) as {
+      data?: { search: SearchPage };
+      errors?: { message: string }[];
+    };
+    if (result.errors?.length) {
+      throw new Error(
+        `GitHub GraphQL error: ${
+          result.errors.map((e) => e.message).join("; ")
+        }`,
+      );
+    }
+    if (result.data === undefined) {
+      throw new Error("GitHub GraphQL returned no data");
+    }
     const page = result.data.search;
     for (const node of page.nodes) {
       if (node !== null) items.push(node);
