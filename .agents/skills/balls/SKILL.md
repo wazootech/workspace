@@ -78,11 +78,13 @@ full shape.
    ```
 
 4. Spot-check the classification against the thread. Write **one line per
-   item**, grouped by move and oldest-waiting first: link, who is waiting, since
-   when, and one short sentence on what they asked. Show the top 10 overall,
-   then counts for the rest. Drop any false positive from the output and say
-   why; if a signal rule is at fault, note it for a code fix rather than working
-   around it silently.
+   item**, keeping the JSON order under three headings: **Ready to merge** (any
+   Merge move), **Waiting on the user** (any Reply or Review move), and
+   **Everything else**. Each is oldest first. Give the move, link, who is
+   waiting, since when, and one short sentence on what they asked. Show the top
+   10 overall, then counts for the rest. Drop any false positive from the output
+   and say why; if a signal rule is at fault, note it for a code fix rather than
+   working around it silently.
 
 When `user` differs from `viewer`, name that person in the third person instead
 of "you", and say that the list covers only what the authenticated account can
@@ -94,8 +96,8 @@ read. Work in repositories outside that access is invisible.
   OpenCode/Codex share one source of truth. Fresh Windows clones need
   `core.symlinks=true` (or Developer Mode) for the symlink to materialize.
 - Script map: `args.ts` (command line), `collect.ts` (search and shortlist),
-  `detail.ts` (whole thread), `classify.ts` and `signals.ts` (rules), `gh.ts`
-  and `query.ts` (GitHub access), `types.ts` (JSON shapes), `*_test.ts` (unit
-  tests).
+  `detail.ts` (whole thread), `classify.ts` and `signals.ts` (rules), `order.ts`
+  (shortlist order), `gh.ts` and `query.ts` (GitHub access), `types.ts` (JSON
+  shapes), `*_test.ts` (unit tests).
 - The collector uses Deno TypeScript; issue #50 tracks porting skill scripts to
   Node-compatible TypeScript under Bun.
