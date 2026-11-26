@@ -2,12 +2,13 @@
  * balls collector. Read-only: GitHub GraphQL search plus REST thread reads,
  * JSON on stdout, no writes and no cache file.
  *
- * Usage: collect.ts [owner|owner/repo]
+ * Usage: collect.ts [--user login] [owner|owner/repo]
  *        collect.ts --detail owner/repo#number
  */
+import { parseArgs } from "./args.ts";
 import { classify } from "./classify.ts";
 import { detail } from "./detail.ts";
-import { searchAll, viewer } from "./gh.ts";
+import { resolveLogin, searchAll, viewer } from "./gh.ts";
 import { MOVES } from "./types.ts";
 import type { Ball, Item, Move } from "./types.ts";
 
@@ -25,8 +26,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const scope = args[0] ?? "wazootech";
-  const who = await viewer();
+  const { user, scope } = parseArgs(args);
+  const me = await viewer();
+  const who = user === undefined ? me : await resolveLogin(user);
   const selector = scope.includes("/") ? `repo:${scope}` : `org:${scope}`;
   const searches = [
     `${selector} is:open involves:${who}`,
@@ -37,12 +39,15 @@ async function main(): Promise<void> {
   const seen = new Set<string>();
   let pages = 0;
   let truncated = false;
+  // Hits of the review-requested search, which also covers the user's teams.
+  const requested = new Set<string>();
   for (const search of searches) {
     const result = await searchAll(search, MAX_PAGES);
     pages += result.pages;
     truncated ||= result.truncated;
     for (const item of result.items) {
       const key = `${item.repository.nameWithOwner}#${item.number}`;
+      if (search.includes("review-requested:")) requested.add(key);
       if (seen.has(key)) continue;
       seen.add(key);
       items.push(item);
@@ -59,7 +64,8 @@ async function main(): Promise<void> {
     } else if (item.repository.isArchived) {
       skipped.archived++;
     } else {
-      const ball = classify(item, who);
+      const key = `${item.repository.nameWithOwner}#${item.number}`;
+      const ball = classify(item, who, requested.has(key));
       if (ball === null) skipped.notActionable++;
       else balls.push(ball);
     }
@@ -75,7 +81,8 @@ async function main(): Promise<void> {
   for (const ball of balls) counts[ball.move]++;
   console.log(JSON.stringify(
     {
-      viewer: who,
+      user: who,
+      viewer: me,
       scope,
       generatedAt: new Date().toISOString(),
       searches,

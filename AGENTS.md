@@ -33,6 +33,10 @@ Do not duplicate child repo guidance here. Route to local docs and source code:
     checkout itself (reported as `(workspace root)`), so a stale federation repo
     shows up as `DIVERGED` rather than silently drifting; untracked
     `repos/`/`worktrees/` content never marks it dirty.
+- **Waiting-on rundowns**: for "what balls are in my court?", "what balls are in
+  `<name>`'s court?", or any question about what is waiting on a person, invoke
+  the [`balls`](.agents/skills/balls/SKILL.md) skill rather than searching
+  GitHub by hand.
 - **Wiki toolchain**: For wiki CLI usage, validation, and maintenance, see
   [`repos/wiki/skills/wiki/SKILL.md`](repos/wiki/skills/wiki/SKILL.md) and
   [`wiki`](repos/wiki).

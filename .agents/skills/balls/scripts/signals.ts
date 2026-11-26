@@ -23,28 +23,28 @@ export function isNoise(body: string): boolean {
     (text.length < NOISE_MAX_CHARS && NOISE.test(text));
 }
 
-export function needsReply(body: string, viewer: string): boolean {
+export function needsReply(body: string, user: string): boolean {
   const text = body.replace(/https?:\/\/\S+/g, " ");
-  return text.includes("?") || text.includes(`@${viewer}`) || ASK.test(text);
+  return text.includes("?") || text.includes(`@${user}`) || ASK.test(text);
 }
 
-function reacted(groups: ReactionGroup[] | null | undefined, viewer: string) {
+function reacted(groups: ReactionGroup[] | null | undefined, user: string) {
   return (groups ?? []).some((g) =>
-    g.users.nodes.some((u) => u.login === viewer)
+    g.users.nodes.some((u) => u.login === user)
   );
 }
 
-export function suppressed(item: Item, viewer: string): boolean {
+export function suppressed(item: Item, user: string): boolean {
   const comments: CommentNode[] = item.comments?.nodes ?? [];
-  return reacted(item.reactionGroups, viewer) ||
-    comments.some((c) => reacted(c.reactionGroups, viewer));
+  return reacted(item.reactionGroups, user) ||
+    comments.some((c) => reacted(c.reactionGroups, user));
 }
 
-export function requestedBy(item: Item, viewer: string): boolean {
-  return (item.reviewRequests?.nodes ?? []).some((r) => {
-    const who = r.requestedReviewer;
-    return who !== null && (who.login === viewer || who.name !== undefined);
-  });
+/** Direct requests only. Team membership comes from the search results. */
+export function requestedBy(item: Item, user: string): boolean {
+  return (item.reviewRequests?.nodes ?? []).some((r) =>
+    r.requestedReviewer?.login === user
+  );
 }
 
 export function collect(item: Item): Activity[] {
@@ -69,19 +69,19 @@ export function collect(item: Item): Activity[] {
 export function involved(
   item: Item,
   acts: Activity[],
-  viewer: string,
+  user: string,
   asked: boolean,
 ) {
   const texts = [item.title, ...acts.map((a) => a.body)];
-  return item.author?.login === viewer ||
-    item.assignees.nodes.some((a) => a.login === viewer) || asked ||
-    acts.some((a) => a.author === viewer) ||
-    texts.some((t) => t.includes(`@${viewer}`));
+  return item.author?.login === user ||
+    item.assignees.nodes.some((a) => a.login === user) || asked ||
+    acts.some((a) => a.author === user) ||
+    texts.some((t) => t.includes(`@${user}`));
 }
 
 export function needsThreadReply(
   item: Item,
-  viewer: string,
+  user: string,
   asked: boolean,
 ): boolean {
   const threads = item.reviewThreads?.nodes ?? [];
@@ -89,8 +89,8 @@ export function needsThreadReply(
     const comments = t.comments.nodes;
     const tail = comments.at(-1);
     return !t.isResolved && tail !== undefined &&
-      tail.author?.login !== viewer &&
-      (comments.some((c) => c.author?.login === viewer) ||
-        item.author?.login === viewer || asked);
+      tail.author?.login !== user &&
+      (comments.some((c) => c.author?.login === user) ||
+        item.author?.login === user || asked);
   });
 }

@@ -1,4 +1,4 @@
-import { strictEqual } from "node:assert/strict";
+import { deepStrictEqual, strictEqual } from "node:assert/strict";
 import { classify } from "./classify.ts";
 import { isNoise } from "./signals.ts";
 import type { Item } from "./types.ts";
@@ -51,7 +51,7 @@ Deno.test("an assigned issue is Fix", () => {
   strictEqual(result?.move, "Fix");
 });
 
-Deno.test("a review request is Review, and a team request counts", () => {
+Deno.test("a review request is Review", () => {
   const pr = item({
     __typename: "PullRequest",
     reviewRequests: {
@@ -59,13 +59,29 @@ Deno.test("a review request is Review, and a team request counts", () => {
     },
   });
   strictEqual(classify(pr, VIEWER)?.move, "Review");
+});
+
+Deno.test("a team request counts only when the user's search matched", () => {
   const team = item({
     __typename: "PullRequest",
     reviewRequests: {
       nodes: [{ requestedReviewer: { name: "eng" } }],
     },
   });
-  strictEqual(classify(team, VIEWER)?.move, "Review");
+  strictEqual(classify(team, VIEWER, true)?.move, "Review");
+  strictEqual(classify(team, "outsider"), null);
+});
+
+Deno.test("the same thread reads differently from each court", () => {
+  const thread = item({
+    author: { login: VIEWER, __typename: "User" },
+    assignees: { nodes: [{ login: "teammate" }] },
+    comments: { nodes: [comment("teammate", "Can you take a look?")] },
+  });
+  strictEqual(classify(thread, VIEWER)?.move, "Reply");
+  const theirs = classify(thread, "teammate");
+  strictEqual(theirs?.move, "Fix");
+  deepStrictEqual(theirs?.secondary, []);
 });
 
 Deno.test("a reply from someone else is Reply when I am involved", () => {

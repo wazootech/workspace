@@ -2,7 +2,7 @@
 import { ghJson } from "./gh.ts";
 
 interface RestComment {
-  author: { login: string } | null;
+  user: { login: string } | null;
   body: string;
   created_at: string;
 }
@@ -28,9 +28,9 @@ export interface Detail {
   reviewComments: { author: string; body: string; at: string }[];
 }
 
-const comments = (list: RestComment[]) =>
+export const comments = (list: RestComment[]) =>
   list.map((c) => ({
-    author: c.author?.login ?? "unknown",
+    author: c.user?.login ?? "unknown",
     body: c.body,
     at: c.created_at,
   }));

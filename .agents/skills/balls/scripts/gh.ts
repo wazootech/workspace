@@ -53,6 +53,17 @@ export async function viewer(): Promise<string> {
   return login;
 }
 
+/** Canonical casing for a login; classification compares logins exactly. */
+export async function resolveLogin(login: string): Promise<string> {
+  try {
+    return await ghText(["api", `users/${login}`, "--jq", ".login"]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/not found|404/i.test(message)) throw error;
+    throw new Error(`no GitHub user named ${login}`);
+  }
+}
+
 export interface SearchResult {
   items: Item[];
   pages: number;
