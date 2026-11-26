@@ -9,6 +9,7 @@ import { parseArgs } from "./args.ts";
 import { classify } from "./classify.ts";
 import { detail } from "./detail.ts";
 import { resolveLogin, searchAll, viewer } from "./gh.ts";
+import { byPriority } from "./order.ts";
 import { MOVES } from "./types.ts";
 import type { Ball, Item, Move } from "./types.ts";
 
@@ -70,10 +71,7 @@ async function main(): Promise<void> {
       else balls.push(ball);
     }
   }
-  balls.sort((a, b) =>
-    MOVES.indexOf(a.move) - MOVES.indexOf(b.move) ||
-    a.since.localeCompare(b.since)
-  );
+  balls.sort(byPriority);
 
   const counts = Object.fromEntries(
     MOVES.map((move) => [move, 0]),
