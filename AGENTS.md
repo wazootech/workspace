@@ -63,8 +63,12 @@ Agent-facing files across the family fall under one membership test with three
 answers:
 
 1. **Workspace-development skills** — developed here, for here. They live in
-   root `skills/`, carry the `wazootech_` prefix, and may couple to harness
-   artifacts (`workspace.json`, board IDs).
+   root `.agents/skills/`, carry the `wz_` prefix, and may couple to harness
+   artifacts (`workspace.json`, board IDs). Codex and OpenCode discover this
+   path natively. Claude Code does not: `.claude/skills/<name>` is a committed
+   symlink to the canonical directory, so there is one source of truth. Fresh
+   Windows clones need `core.symlinks=true` (or Developer Mode) for that link to
+   materialize.
 2. **Packaged product skills** — built for anyone, shipped inside product repos
    at `repos/<product>/skills/<skill>/SKILL.md` and installed via
    `npx skills add <owner>/<repo>@<skill>`. Bare names; origin rides the install
@@ -79,8 +83,10 @@ Placement outcomes: ambient rules live in AGENTS.md (this constitution for the
 family, each repo's manual for repo specifics); procedures live in SKILL.md
 files. Mechanical rules: skill files are named `SKILL.md` (exact casing); a
 skill's frontmatter `name:` equals its directory name; a directory directly
-under root `skills/` without the `wazootech_` prefix fails, as does a
-`wazootech_*` name anywhere outside root `skills/`; wiki-template payloads
+under root `.agents/skills/` without the `wz_` prefix fails, as does a `wz_`
+name anywhere outside `.agents/skills/` (except the `.claude/skills/` symlink
+that points into it). `wz_balls` is an accepted exception to the Agent Skills
+kebab-case naming rule: OpenCode and Codex load it as-is. Wiki-template payloads
 (`repos/wiki-templates/templates/*/AGENTS.md`) — shipped content that doubles as
 live instructions in scaffolded sites — must carry their `template-payload`
 header.
