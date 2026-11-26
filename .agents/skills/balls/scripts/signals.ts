@@ -1,11 +1,12 @@
 /** Content filters and involvement checks shared by the classifier. */
-import type { CommentNode, Item, ReactionGroup } from "./types.ts";
+import type { CommentNode, Item, Thumbs } from "./types.ts";
 
 export interface Activity {
   author: string;
   body: string;
   createdAt: string;
   state?: string;
+  thumbs?: Thumbs;
 }
 
 // Filters read message content, not account names: an agent can post a real ask
@@ -28,16 +29,9 @@ export function needsReply(body: string, user: string): boolean {
   return text.includes("?") || text.includes(`@${user}`) || ASK.test(text);
 }
 
-function reacted(groups: ReactionGroup[] | null | undefined, user: string) {
-  return (groups ?? []).some((g) =>
-    g.users.nodes.some((u) => u.login === user)
-  );
-}
-
-export function suppressed(item: Item, user: string): boolean {
-  const comments: CommentNode[] = item.comments?.nodes ?? [];
-  return reacted(item.reactionGroups, user) ||
-    comments.some((c) => reacted(c.reactionGroups, user));
+/** A thumbs-up from the user on a message acknowledges that message only. */
+export function acknowledged(thumbs: Thumbs | undefined, user: string) {
+  return (thumbs?.nodes ?? []).some((r) => r.user?.login === user);
 }
 
 /** Direct requests only. Team membership comes from the search results. */
@@ -55,6 +49,7 @@ export function collect(item: Item): Activity[] {
       author: c.author?.login ?? "unknown",
       body: c.body,
       createdAt: c.createdAt,
+      thumbs: c.thumbs,
     })),
     ...reviews.filter((r) => !isNoise(r.body) && r.state !== "APPROVED")
       .map((r) => ({
@@ -62,6 +57,7 @@ export function collect(item: Item): Activity[] {
         body: r.body,
         createdAt: r.createdAt,
         state: r.state,
+        thumbs: r.thumbs,
       })),
   ];
 }
@@ -89,7 +85,7 @@ export function needsThreadReply(
     const comments = t.comments.nodes;
     const tail = comments.at(-1);
     return !t.isResolved && tail !== undefined &&
-      tail.author?.login !== user &&
+      tail.author?.login !== user && !acknowledged(tail.thumbs, user) &&
       (comments.some((c) => c.author?.login === user) ||
         item.author?.login === user || asked);
   });

@@ -3,9 +3,12 @@
  * for every comment in the org. `--detail` loads the whole thread separately.
  *
  * `first: 100` is GitHub's page maximum. The `last: 5` and `first: 10` caps
- * bound each candidate; `users(first: 10)` is enough to spot a viewer reaction
- * without pulling every reactor.
+ * bound each candidate; the last 10 thumbs-up are enough to spot an
+ * acknowledgement without pulling every reactor.
  */
+const THUMBS =
+  "thumbs: reactions(content: THUMBS_UP, last: 10) { nodes { user { login } } }";
+
 export const SEARCH_QUERY = `
 query Balls($search: String!, $after: String) {
   search(query: $search, type: ISSUE, first: 100, after: $after) {
@@ -16,12 +19,11 @@ query Balls($search: String!, $after: String) {
         repository { nameWithOwner isArchived }
         author { login __typename }
         assignees(first: 10) { nodes { login } }
-        reactionGroups { content users(first: 10) { nodes { login } } }
         comments(last: 5) {
           nodes {
             author { login __typename }
             body createdAt
-            reactionGroups { content users(first: 10) { nodes { login } } }
+            ${THUMBS}
           }
         }
       }
@@ -30,7 +32,6 @@ query Balls($search: String!, $after: String) {
         repository { nameWithOwner isArchived }
         author { login __typename }
         assignees(first: 10) { nodes { login } }
-        reactionGroups { content users(first: 10) { nodes { login } } }
         reviewRequests(first: 10) {
           nodes {
             requestedReviewer {
@@ -41,20 +42,20 @@ query Balls($search: String!, $after: String) {
         }
         statusCheckRollup { state }
         reviews(last: 5) {
-          nodes { author { login __typename } body state createdAt }
+          nodes { author { login __typename } body state createdAt ${THUMBS} }
         }
         comments(last: 5) {
           nodes {
             author { login __typename }
             body createdAt
-            reactionGroups { content users(first: 10) { nodes { login } } }
+            ${THUMBS}
           }
         }
         reviewThreads(first: 10) {
           nodes {
             isResolved
             comments(last: 5) {
-              nodes { author { login __typename } body createdAt }
+              nodes { author { login __typename } body createdAt ${THUMBS} }
             }
           }
         }

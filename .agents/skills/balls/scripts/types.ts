@@ -5,16 +5,16 @@ export interface Actor {
   __typename: string;
 }
 
-export interface ReactionGroup {
-  content: string;
-  users: { nodes: { login: string }[] };
+/** Thumbs-up reactions only; no other reaction acknowledges anything. */
+export interface Thumbs {
+  nodes: { user: { login: string } | null }[];
 }
 
 export interface CommentNode {
   author: Actor | null;
   body: string;
   createdAt: string;
-  reactionGroups: ReactionGroup[] | null;
+  thumbs?: Thumbs;
 }
 
 export interface ReviewNode {
@@ -22,6 +22,7 @@ export interface ReviewNode {
   body: string;
   state: string;
   createdAt: string;
+  thumbs?: Thumbs;
 }
 
 export interface ReviewRequestNode {
@@ -47,7 +48,6 @@ export interface Item {
   repository: { nameWithOwner: string; isArchived: boolean };
   author: Actor | null;
   assignees: { nodes: { login: string }[] };
-  reactionGroups: ReactionGroup[] | null;
   comments: { nodes: CommentNode[] };
   reviews?: { nodes: ReviewNode[] };
   reviewRequests?: { nodes: ReviewRequestNode[] };

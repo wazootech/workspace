@@ -17,23 +17,19 @@ function item(patch: Partial<Item> = {}): Item {
     repository: { nameWithOwner: "wazootech/workspace", isArchived: false },
     author: { login: "someone", __typename: "User" },
     assignees: { nodes: [] },
-    reactionGroups: [],
     comments: { nodes: [] },
     ...patch,
   };
 }
+
+const thumbsUp = { nodes: [{ user: { login: VIEWER } }] };
 
 function comment(author: string, body: string, reacted = false) {
   return {
     author: { login: author, __typename: "User" },
     body,
     createdAt: "2026-11-24T00:00:00Z",
-    reactionGroups: reacted
-      ? [{
-        content: "THUMBS_UP",
-        users: { nodes: [{ login: VIEWER }] },
-      }]
-      : [],
+    thumbs: reacted ? thumbsUp : undefined,
   };
 }
 
@@ -98,7 +94,42 @@ Deno.test("a reply from someone else is Reply when I am involved", () => {
   strictEqual(result?.who, "someone");
 });
 
-Deno.test("a reaction suppresses Reply but not other moves", () => {
+Deno.test("a thumbs-up on an older comment does not hide a newer ask", () => {
+  const result = classify(
+    item({
+      author: { login: VIEWER, __typename: "User" },
+      comments: {
+        nodes: [
+          comment("someone", "Heads up", true),
+          {
+            ...comment("someone", "Can you decide?"),
+            createdAt: "2026-11-25T00:00:00Z",
+          },
+        ],
+      },
+    }),
+    VIEWER,
+  );
+  strictEqual(result?.move, "Reply");
+});
+
+Deno.test("a thumbs-up on a thread's last comment acknowledges it", () => {
+  const thread = (reacted: boolean) =>
+    item({
+      __typename: "PullRequest",
+      author: { login: VIEWER, __typename: "User" },
+      reviewThreads: {
+        nodes: [{
+          isResolved: false,
+          comments: { nodes: [comment("someone", "Rename this", reacted)] },
+        }],
+      },
+    });
+  strictEqual(classify(thread(false), VIEWER)?.move, "Reply");
+  strictEqual(classify(thread(true), VIEWER), null);
+});
+
+Deno.test("a thumbs-up on the last comment clears Reply, not other moves", () => {
   const reacted = item({
     assignees: { nodes: [{ login: VIEWER }] },
     comments: { nodes: [comment("someone", "Need a decision here", true)] },
@@ -119,7 +150,6 @@ Deno.test("bot noise alone is not a ball; a bot reply on my thread is", () => {
         author: { login: "dependabot", __typename: "Bot" },
         body: "bump foo from 1.0.0 to 1.0.1",
         createdAt: "2026-11-24T00:00:00Z",
-        reactionGroups: [],
       }],
     },
     author: { login: VIEWER, __typename: "User" },
@@ -132,7 +162,6 @@ Deno.test("bot noise alone is not a ball; a bot reply on my thread is", () => {
         author: { login: "published-bot", __typename: "Bot" },
         body: "I addressed your comments; ready for another pass",
         createdAt: "2026-11-24T00:00:00Z",
-        reactionGroups: [],
       }],
     },
     author: { login: VIEWER, __typename: "User" },

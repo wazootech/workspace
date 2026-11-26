@@ -1,11 +1,11 @@
 /** Mechanical pass over the issue table. The model does the final judgment. */
 import {
+  acknowledged,
   collect,
   involved,
   needsReply,
   needsThreadReply,
   requestedBy,
-  suppressed,
 } from "./signals.ts";
 import { MOVES } from "./types.ts";
 import type { Ball, Item } from "./types.ts";
@@ -54,9 +54,9 @@ export function classify(
   const fix = assigned || (isPr &&
     ((userAuthored && (changes || failing || conflict)) || theirChanges));
   const lastAsks = newest !== undefined && newest.author !== user &&
+    !acknowledged(newest.thumbs, user) &&
     (newest.state === "CHANGES_REQUESTED" || needsReply(newest.body, user));
-  const reply = !suppressed(item, user) &&
-    (lastAsks || needsThreadReply(item, user, asked));
+  const reply = lastAsks || needsThreadReply(item, user, asked);
   const review = isPr && asked && !userAuthored;
   const merge = isPr && userAuthored && approvals && !changes && green;
 

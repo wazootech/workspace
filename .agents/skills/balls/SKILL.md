@@ -56,8 +56,9 @@ Every item is classified by the mechanical table:
 Precedence is **Fix > Reply > Review > Merge**; secondary moves are listed.
 Closed, merged, archived, and draft pull requests are skipped. Content-based bot
 noise (CI, deploy, preview, dependency bumps) is filtered and counted; a bot
-reply on a thread they own still counts. A reaction from the user anywhere on an
-item suppresses its Reply move only. Agent-signed comments count as human.
+reply on a thread they own still counts. A 👍 from the user on the newest
+comment or review, or on a review thread's last comment, acknowledges it and
+clears that Reply only. Agent-signed comments count as human.
 
 The JSON has `user` (whose court), `viewer` (who is authenticated), `scope`,
 `searches`, and `meta` (`pages`, `truncated`, `scanned`, `skipped`, `counts`)
