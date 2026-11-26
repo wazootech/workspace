@@ -40,7 +40,6 @@
     "stream",
     "sparql-engine",
     "reasoner",
-    "wazoo-memorybench",
     "wazoobench",
     "computer",
     "data",
