@@ -13,8 +13,13 @@ query($id: ID!, $after: String) {
           signal: fieldValueByName(name: "Signal") { ...Pick }
           content {
             __typename
-            ... on Issue { url state }
-            ... on PullRequest { url state }
+            ... on Issue {
+              url state updatedAt
+              closedByPullRequestsReferences(
+                first: 20, includeClosedPrs: true
+              ) { nodes { url state } }
+            }
+            ... on PullRequest { url state updatedAt }
           }
         }
       }
