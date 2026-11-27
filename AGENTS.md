@@ -223,9 +223,9 @@ review discipline.
   a reason on the same line.
 - **File size.** At most 120 lines of code per file (300 for tests), counting
   neither blank, comment, nor import lines. Generated, vendored, schema,
-  snapshot, and fixture files are exempt. The check (`code-health.yml`) is
-  warn-only while existing files are split; never add a new violation, and split
-  a file when you touch it. Function limits worth holding in review: about 40
+  snapshot, and fixture files are exempt. The check (`code-health.yml`) fails
+  on a new violation; files that predate it are listed there with a ceiling that
+  only shrinks. Split a file when you touch it. Function limits worth holding in review: about 40
   lines, complexity 10, nesting 3, four parameters.
 - **TODOs.** A `TODO` or `FIXME` links an issue.
 - **Supply chain.** Pin third-party workflow actions to a full commit SHA with a
