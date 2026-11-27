@@ -20,8 +20,9 @@ const ASK =
 
 export function isNoise(body: string): boolean {
   const text = body.trim();
-  return text.length === 0 ||
-    (text.length < NOISE_MAX_CHARS && NOISE.test(text));
+  return (
+    text.length === 0 || (text.length < NOISE_MAX_CHARS && NOISE.test(text))
+  );
 }
 
 export function needsReply(body: string, user: string): boolean {
@@ -36,8 +37,8 @@ export function acknowledged(thumbs: Thumbs | undefined, user: string) {
 
 /** Direct requests only. Team membership comes from the search results. */
 export function requestedBy(item: Item, user: string): boolean {
-  return (item.reviewRequests?.nodes ?? []).some((r) =>
-    r.requestedReviewer?.login === user
+  return (item.reviewRequests?.nodes ?? []).some(
+    (r) => r.requestedReviewer?.login === user,
   );
 }
 
@@ -45,13 +46,16 @@ export function collect(item: Item): Activity[] {
   const comments: CommentNode[] = item.comments?.nodes ?? [];
   const reviews = item.reviews?.nodes ?? [];
   return [
-    ...comments.filter((c) => !isNoise(c.body)).map((c) => ({
-      author: c.author?.login ?? "unknown",
-      body: c.body,
-      createdAt: c.createdAt,
-      thumbs: c.thumbs,
-    })),
-    ...reviews.filter((r) => !isNoise(r.body) && r.state !== "APPROVED")
+    ...comments
+      .filter((c) => !isNoise(c.body))
+      .map((c) => ({
+        author: c.author?.login ?? "unknown",
+        body: c.body,
+        createdAt: c.createdAt,
+        thumbs: c.thumbs,
+      })),
+    ...reviews
+      .filter((r) => !isNoise(r.body) && r.state !== "APPROVED")
       .map((r) => ({
         author: r.author?.login ?? "unknown",
         body: r.body,
@@ -69,10 +73,13 @@ export function involved(
   asked: boolean,
 ) {
   const texts = [item.title, ...acts.map((a) => a.body)];
-  return item.author?.login === user ||
-    item.assignees.nodes.some((a) => a.login === user) || asked ||
+  return (
+    item.author?.login === user ||
+    item.assignees.nodes.some((a) => a.login === user) ||
+    asked ||
     acts.some((a) => a.author === user) ||
-    texts.some((t) => t.includes(`@${user}`));
+    texts.some((t) => t.includes(`@${user}`))
+  );
 }
 
 export function needsThreadReply(
@@ -84,9 +91,14 @@ export function needsThreadReply(
   return threads.some((t) => {
     const comments = t.comments.nodes;
     const tail = comments.at(-1);
-    return !t.isResolved && tail !== undefined &&
-      tail.author?.login !== user && !acknowledged(tail.thumbs, user) &&
+    return (
+      !t.isResolved &&
+      tail !== undefined &&
+      tail.author?.login !== user &&
+      !acknowledged(tail.thumbs, user) &&
       (comments.some((c) => c.author?.login === user) ||
-        item.author?.login === user || asked);
+        item.author?.login === user ||
+        asked)
+    );
   });
 }

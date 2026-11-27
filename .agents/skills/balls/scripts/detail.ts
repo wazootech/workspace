@@ -40,22 +40,22 @@ export async function detail(key: string): Promise<Detail> {
   if (parts === null) throw new Error("detail expects owner/repo#number");
   const [, repo, number] = parts;
   const base = `repos/${repo}/issues/${number}`;
-  const issue = await ghJson(["api", base]) as RestIssue;
-  const thread = await ghJson([
+  const issue = (await ghJson(["api", base])) as RestIssue;
+  const thread = (await ghJson([
     "api",
     `${base}/comments?per_page=100`,
-  ]) as RestComment[];
+  ])) as RestComment[];
   let reviews: RestReview[] = [];
   let reviewComments: RestComment[] = [];
   try {
-    reviews = await ghJson([
+    reviews = (await ghJson([
       "api",
       `repos/${repo}/pulls/${number}/reviews?per_page=100`,
-    ]) as RestReview[];
-    reviewComments = await ghJson([
+    ])) as RestReview[];
+    reviewComments = (await ghJson([
       "api",
       `repos/${repo}/pulls/${number}/comments?per_page=100`,
-    ]) as RestComment[];
+    ])) as RestComment[];
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     // Issues have no pull-request endpoints; auth and rate-limit failures must

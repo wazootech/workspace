@@ -120,10 +120,12 @@ test("a thumbs-up on a thread's last comment acknowledges it", () => {
       __typename: "PullRequest",
       author: { login: VIEWER, __typename: "User" },
       reviewThreads: {
-        nodes: [{
-          isResolved: false,
-          comments: { nodes: [comment("someone", "Rename this", reacted)] },
-        }],
+        nodes: [
+          {
+            isResolved: false,
+            comments: { nodes: [comment("someone", "Rename this", reacted)] },
+          },
+        ],
       },
     });
   strictEqual(classify(thread(false), VIEWER)?.move, "Reply");
@@ -147,11 +149,13 @@ test("a thumbs-up on the last comment clears Reply, not other moves", () => {
 test("bot noise alone is not a ball; a bot reply on my thread is", () => {
   const noise = item({
     comments: {
-      nodes: [{
-        author: { login: "dependabot", __typename: "Bot" },
-        body: "bump foo from 1.0.0 to 1.0.1",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "dependabot", __typename: "Bot" },
+          body: "bump foo from 1.0.0 to 1.0.1",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
     author: { login: VIEWER, __typename: "User" },
   });
@@ -159,11 +163,13 @@ test("bot noise alone is not a ball; a bot reply on my thread is", () => {
 
   const reply = item({
     comments: {
-      nodes: [{
-        author: { login: "published-bot", __typename: "Bot" },
-        body: "I addressed your comments; ready for another pass",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "published-bot", __typename: "Bot" },
+          body: "I addressed your comments; ready for another pass",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
     author: { login: VIEWER, __typename: "User" },
   });
@@ -223,12 +229,14 @@ test("an approved green PR authored by me is Merge", () => {
     mergeable: "MERGEABLE",
     statusCheckRollup: { state: "SUCCESS" },
     reviews: {
-      nodes: [{
-        author: { login: "reviewer", __typename: "User" },
-        body: "LGTM",
-        state: "APPROVED",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "reviewer", __typename: "User" },
+          body: "LGTM",
+          state: "APPROVED",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
   });
   strictEqual(classify(pr, VIEWER)?.move, "Merge");

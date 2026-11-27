@@ -83,9 +83,9 @@ export async function searchAll(
     };
     if (result.errors?.length) {
       throw new Error(
-        `GitHub GraphQL error: ${
-          result.errors.map((e) => e.message).join("; ")
-        }`,
+        `GitHub GraphQL error: ${result.errors
+          .map((e) => e.message)
+          .join("; ")}`,
       );
     }
     if (result.data === undefined) {

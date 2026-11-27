@@ -28,12 +28,15 @@ test("merges lead, then people waiting, then everything else", () => {
     ball("merge", "2026-11-25", "Merge"),
     ball("newer-assignment", "2026-09-01", "Fix"),
   ].sort(byPriority);
-  deepStrictEqual(sorted.map((b) => b.key), [
-    "merge",
-    "fix-with-reply",
-    "re-review",
-    "new-reply",
-    "old-assignment",
-    "newer-assignment",
-  ]);
+  deepStrictEqual(
+    sorted.map((b) => b.key),
+    [
+      "merge",
+      "fix-with-reply",
+      "re-review",
+      "new-reply",
+      "old-assignment",
+      "newer-assignment",
+    ],
+  );
 });

@@ -74,23 +74,26 @@ async function main(): Promise<void> {
   }
   balls.sort(byPriority);
 
-  const counts = Object.fromEntries(
-    MOVES.map((move) => [move, 0]),
-  ) as Record<Move, number>;
+  const counts = Object.fromEntries(MOVES.map((move) => [move, 0])) as Record<
+    Move,
+    number
+  >;
   for (const ball of balls) counts[ball.move]++;
-  console.log(JSON.stringify(
-    {
-      user: who,
-      viewer: me,
-      scope,
-      generatedAt: new Date().toISOString(),
-      searches,
-      meta: { pages, truncated, scanned: items.length, skipped, counts },
-      balls,
-    },
-    null,
-    2,
-  ));
+  console.log(
+    JSON.stringify(
+      {
+        user: who,
+        viewer: me,
+        scope,
+        generatedAt: new Date().toISOString(),
+        searches,
+        meta: { pages, truncated, scanned: items.length, skipped, counts },
+        balls,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 main().catch((error: unknown) => {

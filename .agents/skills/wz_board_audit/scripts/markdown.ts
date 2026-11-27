@@ -9,7 +9,10 @@ export function listing(title: string, rows: string[]): string {
 }
 
 export function section(title: string, urls: string[]): string {
-  return listing(title, [...urls].sort().map((url) => `- ${link(url)}`));
+  return listing(
+    title,
+    [...urls].sort().map((url) => `- ${link(url)}`),
+  );
 }
 
 export const notRun = (title: string, reason: string) =>
