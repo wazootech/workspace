@@ -197,7 +197,8 @@ deploying. Pause and ask when an action is irreversible or high-risk:
 ### Publishing to JSR
 
 Each family package publishes through its own `.github/workflows/publish.yml`:
-the runner syncs the OpenAPI snapshot, compares `deno.json`'s `version` against
+the runner syncs the OpenAPI snapshot, compares the manifest `version` (`jsr.json`, or `deno.json` in repos still
+on Deno) against
 the published JSR latest, skips cleanly when they already match, and fails
 loudly when a bump still ends up "already published". The trigger differs per
 repo — `wazoo-client-ts` and `worlds-client-ts` fire on `release: published`,
@@ -228,7 +229,8 @@ review discipline.
   lines, complexity 10, nesting 3, four parameters.
 - **TODOs.** A `TODO` or `FIXME` links an issue.
 - **Supply chain.** Pin third-party workflow actions to a full commit SHA with a
-  `# vX.Y.Z` comment, pin toolchains exactly (`deno-version`, `.node-version`),
+  `# vX.Y.Z` comment, pin toolchains exactly (`.node-version`, and
+  `deno-version` where Deno remains),
   and install from the lockfile frozen. Renovate proposes bumps; do not
   hand-edit pins to float. The one exception is Bun: workflows set
   `bun-version: "1.x"` so Bun regressions surface early while it develops (owner

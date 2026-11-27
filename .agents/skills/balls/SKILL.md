@@ -10,7 +10,8 @@ Run everything from the workspace root.
 
 ## Requirements
 
-- Deno 2.x — the tasks below use `deno task`.
+- Bun 1.4.5 or newer. The scripts use only `node:` modules, so no install
+  step is needed.
 - `gh` installed and authenticated (`gh auth status`). The collector reads
   GitHub over the network with your credentials.
 
@@ -30,7 +31,7 @@ the asker typed can be passed as-is, member or not.
 ## Collect
 
 ```sh
-deno task balls:collect
+bun run balls:collect
 ```
 
 The task executes `.agents/skills/balls/scripts/collect.ts`. Run it; there is no
@@ -39,8 +40,8 @@ by default, and prints JSON to stdout. Pass `--user <login>` to look from
 someone else's court, and `owner` or `owner/repo` to replace the scope:
 
 ```sh
-deno task balls:collect wazootech/workspace
-deno task balls:collect --user octocat
+bun run balls:collect wazootech/workspace
+bun run balls:collect --user octocat
 ```
 
 It pages up to 1000 results per search (10 pages of 100) and reports truncation.
@@ -74,7 +75,7 @@ full shape.
 3. For each shortlisted ball, fetch the whole thread:
 
    ```sh
-   deno task balls:collect --detail wazootech/workspace#56
+   bun run balls:collect --detail wazootech/workspace#56
    ```
 
 4. Spot-check the classification against the thread. Write **one line per
@@ -99,5 +100,5 @@ read. Work in repositories outside that access is invisible.
   `detail.ts` (whole thread), `classify.ts` and `signals.ts` (rules), `order.ts`
   (shortlist order), `gh.ts` and `query.ts` (GitHub access), `types.ts` (JSON
   shapes), `*_test.ts` (unit tests).
-- The collector uses Deno TypeScript; issue #50 tracks porting skill scripts to
-  Node-compatible TypeScript under Bun.
+- The scripts are Node-compatible TypeScript; test them with
+  `bun run balls:test`.

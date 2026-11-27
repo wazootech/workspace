@@ -1,0 +1,10 @@
+# Child checkouts and local-only material are not this repository's to format.
+repos/
+worktrees/
+workspaces/
+secrets/
+docs/
+tmp/
+scratch/
+handoff.md
+bun.lock
