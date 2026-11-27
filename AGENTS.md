@@ -259,10 +259,9 @@ exist so that does not happen again.
   it does not document them.
 - **Add only what the harness needs.** There is no fixed file-count ceiling (the
   old twelve-file cap was lifted on 2026-11-23); a small script that checks or
-  federates checkouts earns its place, such as `scripts/check-manifests.ts`. A
-  scratch note, agent transcript, runbook, secret inventory, run log, design
-  document, or generated report is still not a candidate here and belongs in the
-  repository that owns it.
+  federates checkouts earns its place. A scratch note, agent transcript,
+  runbook, secret inventory, run log, design document, or generated report is
+  still not a candidate here and belongs in the repository that owns it.
 - **Never add session-shaped material.** Agent transcripts, exported
   conversation logs, captured command output, and environment dumps are
   gitignored for that reason. An unfiltered log is how a private repository
