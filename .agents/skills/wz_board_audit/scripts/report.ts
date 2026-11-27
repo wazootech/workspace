@@ -1,18 +1,7 @@
 /** Turns complete reads into the Markdown report. Pure. */
+import { FIXED, merged, STALE, stale } from "./activity.ts";
+import { notRun, section } from "./markdown.ts";
 import type { BoardItem, Fetched } from "./types.ts";
-
-export function link(url: string): string {
-  const parts = url.split("/");
-  return `[${parts.at(-3)}#${parts.at(-1)}](${url})`;
-}
-
-function section(title: string, urls: string[]): string {
-  const rows = [...urls].sort().map((url) => `- ${link(url)}`);
-  return [`### ${title}: ${urls.length}`, ...rows].join("\n");
-}
-
-const notRun = (title: string, reason: string) =>
-  `### ${title}: NOT RUN\n${reason}`;
 
 const MISSING = "Check 1: open issues not on the board";
 const UNTRIAGED = "Check 2: open items with no Priority, to triage";
@@ -25,7 +14,7 @@ function missing(board: BoardItem[], open: string[]): string {
   return section(MISSING, open.filter((url) => !known.has(url)));
 }
 
-function boardChecks(board: BoardItem[]): string[] {
+function boardChecks(board: BoardItem[], takenAt: string): string[] {
   const live = board.filter((item) => !item.archived);
   const urls = (keep: (item: BoardItem) => boolean) =>
     live.filter(keep).flatMap((item) => item.url ?? []);
@@ -41,6 +30,8 @@ function boardChecks(board: BoardItem[]): string[] {
       UNSYNCED,
       urls((i) => issue(i, "CLOSED") && i.status !== "Done"),
     ),
+    merged(live),
+    stale(live, takenAt),
     section(DRIFT, urls((i) => issue(i, "OPEN") && i.status === "Done")),
   ];
 }
@@ -64,9 +55,9 @@ export function report(
   if (board.ok && open.ok) out.push(missing(board.value, open.value));
   else if (!board.ok) out.push(notRun(MISSING, board.reason));
   else if (!open.ok) out.push(notRun(MISSING, open.reason));
-  if (board.ok) out.push(...boardChecks(board.value));
+  if (board.ok) out.push(...boardChecks(board.value, takenAt));
   else {
-    const titles = [UNTRIAGED, PARKED, UNSYNCED, DRIFT];
+    const titles = [UNTRIAGED, PARKED, UNSYNCED, FIXED, STALE, DRIFT];
     out.push(...titles.map((title) => notRun(title, board.reason)));
   }
   return out.join("\n\n");

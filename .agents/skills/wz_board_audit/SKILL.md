@@ -1,6 +1,6 @@
 ---
 name: wz_board_audit
-description: Lists where the Wazoo Platform Big Picture board disagrees with GitHub — open issues missing from the board, items with no Priority, closed issues not marked Done, and open issues marked Done. Use when asked to audit, check, or reconcile the board, or to verify a triage run's report.
+description: Lists where the Wazoo Platform Big Picture board disagrees with GitHub — open issues missing from the board, items with no Priority, closed issues not marked Done, open issues marked Done, In Progress items with merged fixes, and stale P0/P1 items. Use when asked to audit, check, or reconcile the board, or to verify a triage run's report.
 ---
 
 # Audit the Big Picture board
@@ -27,10 +27,14 @@ not run.
 
 ## Scope
 
-Checks 1, 2, 3, and 6 of the nightly routine (wazootech/workspace#15). Merged
-fixes (check 4) and stale P0/P1 items (check 5) are not covered. Check 1
-compares every open issue in unarchived repos with the board, not only the ones
-created since the last run.
+The six checks of the nightly routine (wazootech/workspace#15). Check 1 compares
+every open issue in unarchived repos with the board, not only the ones created
+since the last run.
+
+Check 4 sees only pull requests GitHub links as closing an issue, and a merged
+fix does not show that production runs it. Never set Status to Done from this
+list: the board may close an issue that is marked Done. Check 5 counts the days
+since the issue or pull request was last updated.
 
 An empty list means nothing matched among the repos your token can see.
 

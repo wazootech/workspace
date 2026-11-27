@@ -8,6 +8,9 @@ export interface BoardItem {
   status: string | null;
   priority: string | null;
   signal: string | null;
+  updatedAt: string | null;
+  /** Merged pull requests GitHub links as closing this issue. */
+  mergedFixes: string[];
 }
 
 /** A read that either finished completely or says why it did not. */

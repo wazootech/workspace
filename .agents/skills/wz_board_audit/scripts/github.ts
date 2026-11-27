@@ -17,7 +17,16 @@ interface BoardNode {
   status: Value;
   priority: Value;
   signal: Value;
-  content: { __typename: string; url?: string; state?: string } | null;
+  content: Content | null;
+}
+interface Content {
+  __typename: string;
+  url?: string;
+  state?: string;
+  updatedAt?: string;
+  closedByPullRequestsReferences?: {
+    nodes: { url: string; state: string }[];
+  };
 }
 
 /** Retries because large GraphQL reads sometimes fail with HTTP 502. */
@@ -61,6 +70,10 @@ function toBoardItem(node: BoardNode): BoardItem {
     status: node.status?.name ?? null,
     priority: node.priority?.name ?? null,
     signal: node.signal?.name ?? null,
+    updatedAt: node.content?.updatedAt ?? null,
+    mergedFixes: (node.content?.closedByPullRequestsReferences?.nodes ?? [])
+      .filter((pr) => pr.state === "MERGED")
+      .map((pr) => pr.url),
   };
 }
 
