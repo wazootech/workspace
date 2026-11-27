@@ -1,7 +1,8 @@
 import { deepStrictEqual } from "node:assert/strict";
+import { test } from "node:test";
 import { comments } from "./detail.ts";
 
-Deno.test("REST comments name their author under user", () => {
+test("REST comments name their author under user", () => {
   deepStrictEqual(
     comments([{
       user: { login: "octocat" },

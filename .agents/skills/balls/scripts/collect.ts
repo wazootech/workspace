@@ -5,6 +5,7 @@
  * Usage: collect.ts [--user login] [owner|owner/repo]
  *        collect.ts --detail owner/repo#number
  */
+import process from "node:process";
 import { parseArgs } from "./args.ts";
 import { classify } from "./classify.ts";
 import { detail } from "./detail.ts";
@@ -17,7 +18,7 @@ import type { Ball, Item, Move } from "./types.ts";
 const MAX_PAGES = 10;
 
 async function main(): Promise<void> {
-  const args = Deno.args;
+  const args = process.argv.slice(2);
   if (args[0] === "--detail") {
     const key = args[1];
     if (key === undefined) {
@@ -94,5 +95,5 @@ async function main(): Promise<void> {
 
 main().catch((error: unknown) => {
   console.error(error instanceof Error ? error.message : String(error));
-  Deno.exit(1);
+  process.exit(1);
 });
