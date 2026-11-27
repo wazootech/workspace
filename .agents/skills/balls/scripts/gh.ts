@@ -1,40 +1,31 @@
 /** gh CLI wrapper. The GraphQL query is piped through stdin: PowerShell
  * mangles inline `-f query=...`, but `-F query=@-` works everywhere. */
+import { spawn } from "node:child_process";
 import { SEARCH_QUERY } from "./query.ts";
 import type { Item, SearchPage } from "./types.ts";
 
-const decode = (bytes: Uint8Array) => new TextDecoder().decode(bytes);
-
-async function run(args: string[], input?: string): Promise<string> {
-  const cmd = new Deno.Command("gh", {
-    args,
-    stdin: input === undefined ? undefined : "piped",
-    stdout: "piped",
-    stderr: "piped",
+function run(args: string[], input?: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn("gh", args);
+    const out: string[] = [];
+    const err: string[] = [];
+    child.stdout.setEncoding("utf8").on("data", (c: string) => out.push(c));
+    child.stderr.setEncoding("utf8").on("data", (c: string) => err.push(c));
+    child.on("error", (error) => {
+      reject(
+        new Error(
+          `Could not run gh (install and authenticate it first): ${error.message}`,
+        ),
+      );
+    });
+    child.on("close", (code) => {
+      if (code === 0) resolve(out.join(""));
+      else reject(new Error(err.join("").trim() || `gh ${args[0]} failed`));
+    });
+    // gh can exit before reading its input; the exit code reports that.
+    child.stdin.on("error", () => {});
+    child.stdin.end(input ?? "");
   });
-  let output: Deno.CommandOutput;
-  try {
-    if (input === undefined) {
-      output = await cmd.output();
-    } else {
-      const child = cmd.spawn();
-      const writer = child.stdin.getWriter();
-      await writer.write(new TextEncoder().encode(input));
-      await writer.close();
-      output = await child.output();
-    }
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    throw new Error(
-      `Could not run gh (install and authenticate it first): ${detail}`,
-    );
-  }
-  if (output.code !== 0) {
-    throw new Error(
-      decode(output.stderr).trim() || `gh ${args.join(" ")} failed`,
-    );
-  }
-  return decode(output.stdout);
 }
 
 export async function ghJson(args: string[]): Promise<unknown> {
@@ -92,9 +83,9 @@ export async function searchAll(
     };
     if (result.errors?.length) {
       throw new Error(
-        `GitHub GraphQL error: ${
-          result.errors.map((e) => e.message).join("; ")
-        }`,
+        `GitHub GraphQL error: ${result.errors
+          .map((e) => e.message)
+          .join("; ")}`,
       );
     }
     if (result.data === undefined) {

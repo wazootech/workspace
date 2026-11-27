@@ -1,0 +1,29 @@
+{
+  "name": "wazoo-workspace",
+  "private": true,
+  "type": "module",
+  "description": "Wazoo workspace harness: manifest tasks and agent skills.",
+  "packageManager": "bun@1.4.5",
+  "scripts": {
+    "workspace:check": "bun node_modules/@wazoo/workspace/src/cli.js check",
+    "workspace:install": "bun node_modules/@wazoo/workspace/src/cli.js install",
+    "workspace:update": "bun node_modules/@wazoo/workspace/src/cli.js update",
+    "workspace:validate": "bun node_modules/@wazoo/workspace/src/cli.js validate",
+    "workspace:bootstrap": "bun run workspace:install",
+    "balls:collect": "bun .agents/skills/balls/scripts/collect.ts",
+    "balls:test": "bun test ./.agents/skills/balls/scripts",
+    "board:audit": "bun .agents/skills/wz_board_audit/scripts/audit.ts",
+    "board:test": "bun test ./.agents/skills/wz_board_audit/scripts",
+    "fmt": "bun fmt --no-script",
+    "fmt:check": "bun fmt --no-script --check",
+    "lint": "oxlint --deny-warnings .agents",
+    "check": "bun check --no-script",
+    "test": "bun run balls:test && bun run board:test",
+    "ci": "bun run fmt:check && bun run lint && bun run check && bun run workspace:validate && bun run test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@wazoo/workspace": "npm:@jsr/wazoo__workspace@0.8.1",
+    "oxlint": "1.95.0"
+  }
+}

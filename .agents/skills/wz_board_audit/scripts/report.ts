@@ -11,7 +11,10 @@ const DRIFT = "Check 6: open issues whose Status is Done";
 
 function missing(board: BoardItem[], open: string[]): string {
   const known = new Set(board.map((item) => item.url));
-  return section(MISSING, open.filter((url) => !known.has(url)));
+  return section(
+    MISSING,
+    open.filter((url) => !known.has(url)),
+  );
 }
 
 function boardChecks(board: BoardItem[], takenAt: string): string[] {
@@ -24,15 +27,24 @@ function boardChecks(board: BoardItem[], takenAt: string): string[] {
   const issue = (item: BoardItem, state: string) =>
     item.type === "Issue" && item.state === state;
   return [
-    section(UNTRIAGED, urls((i) => bare(i) && !parked(i))),
-    section(PARKED, urls((i) => bare(i) && parked(i))),
+    section(
+      UNTRIAGED,
+      urls((i) => bare(i) && !parked(i)),
+    ),
+    section(
+      PARKED,
+      urls((i) => bare(i) && parked(i)),
+    ),
     section(
       UNSYNCED,
       urls((i) => issue(i, "CLOSED") && i.status !== "Done"),
     ),
     merged(live),
     stale(live, takenAt),
-    section(DRIFT, urls((i) => issue(i, "OPEN") && i.status === "Done")),
+    section(
+      DRIFT,
+      urls((i) => issue(i, "OPEN") && i.status === "Done"),
+    ),
   ];
 }
 

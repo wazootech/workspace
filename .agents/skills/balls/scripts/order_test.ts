@@ -1,4 +1,5 @@
 import { deepStrictEqual } from "node:assert/strict";
+import { test } from "node:test";
 import { byPriority } from "./order.ts";
 import type { Ball, Move } from "./types.ts";
 
@@ -18,7 +19,7 @@ function ball(key: string, since: string, ...moves: Move[]): Ball {
   };
 }
 
-Deno.test("merges lead, then people waiting, then everything else", () => {
+test("merges lead, then people waiting, then everything else", () => {
   const sorted = [
     ball("old-assignment", "2026-08-01", "Fix"),
     ball("new-reply", "2026-11-20", "Reply"),
@@ -27,12 +28,15 @@ Deno.test("merges lead, then people waiting, then everything else", () => {
     ball("merge", "2026-11-25", "Merge"),
     ball("newer-assignment", "2026-09-01", "Fix"),
   ].sort(byPriority);
-  deepStrictEqual(sorted.map((b) => b.key), [
-    "merge",
-    "fix-with-reply",
-    "re-review",
-    "new-reply",
-    "old-assignment",
-    "newer-assignment",
-  ]);
+  deepStrictEqual(
+    sorted.map((b) => b.key),
+    [
+      "merge",
+      "fix-with-reply",
+      "re-review",
+      "new-reply",
+      "old-assignment",
+      "newer-assignment",
+    ],
+  );
 });

@@ -35,7 +35,7 @@ function graphql(query: string, variables: Record<string, string>): unknown {
   for (const [key, value] of Object.entries(variables)) {
     args.push("-f", `${key}=${value}`);
   }
-  for (let tries = 1;; tries++) {
+  for (let tries = 1; ; tries++) {
     try {
       const text = execFileSync("gh", args, {
         encoding: "utf8",

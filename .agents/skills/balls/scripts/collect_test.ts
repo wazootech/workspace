@@ -1,4 +1,5 @@
 import { deepStrictEqual, strictEqual } from "node:assert/strict";
+import { test } from "node:test";
 import { classify } from "./classify.ts";
 import { isNoise } from "./signals.ts";
 import type { Item } from "./types.ts";
@@ -33,13 +34,13 @@ function comment(author: string, body: string, reacted = false) {
   };
 }
 
-Deno.test("noise is filtered by content, not by account", () => {
+test("noise is filtered by content, not by account", () => {
   strictEqual(isNoise("all checks have passed"), true);
   strictEqual(isNoise("bump foo from 1.0.0 to 1.0.1"), true);
   strictEqual(isNoise("Can you take a look at this?"), false);
 });
 
-Deno.test("an assigned issue is Fix", () => {
+test("an assigned issue is Fix", () => {
   const result = classify(
     item({ assignees: { nodes: [{ login: VIEWER }] } }),
     VIEWER,
@@ -47,7 +48,7 @@ Deno.test("an assigned issue is Fix", () => {
   strictEqual(result?.move, "Fix");
 });
 
-Deno.test("a review request is Review", () => {
+test("a review request is Review", () => {
   const pr = item({
     __typename: "PullRequest",
     reviewRequests: {
@@ -57,7 +58,7 @@ Deno.test("a review request is Review", () => {
   strictEqual(classify(pr, VIEWER)?.move, "Review");
 });
 
-Deno.test("a team request counts only when the user's search matched", () => {
+test("a team request counts only when the user's search matched", () => {
   const team = item({
     __typename: "PullRequest",
     reviewRequests: {
@@ -68,7 +69,7 @@ Deno.test("a team request counts only when the user's search matched", () => {
   strictEqual(classify(team, "outsider"), null);
 });
 
-Deno.test("the same thread reads differently from each court", () => {
+test("the same thread reads differently from each court", () => {
   const thread = item({
     author: { login: VIEWER, __typename: "User" },
     assignees: { nodes: [{ login: "teammate" }] },
@@ -80,7 +81,7 @@ Deno.test("the same thread reads differently from each court", () => {
   deepStrictEqual(theirs?.secondary, []);
 });
 
-Deno.test("a reply from someone else is Reply when I am involved", () => {
+test("a reply from someone else is Reply when I am involved", () => {
   const result = classify(
     item({
       comments: {
@@ -94,7 +95,7 @@ Deno.test("a reply from someone else is Reply when I am involved", () => {
   strictEqual(result?.who, "someone");
 });
 
-Deno.test("a thumbs-up on an older comment does not hide a newer ask", () => {
+test("a thumbs-up on an older comment does not hide a newer ask", () => {
   const result = classify(
     item({
       author: { login: VIEWER, __typename: "User" },
@@ -113,23 +114,25 @@ Deno.test("a thumbs-up on an older comment does not hide a newer ask", () => {
   strictEqual(result?.move, "Reply");
 });
 
-Deno.test("a thumbs-up on a thread's last comment acknowledges it", () => {
+test("a thumbs-up on a thread's last comment acknowledges it", () => {
   const thread = (reacted: boolean) =>
     item({
       __typename: "PullRequest",
       author: { login: VIEWER, __typename: "User" },
       reviewThreads: {
-        nodes: [{
-          isResolved: false,
-          comments: { nodes: [comment("someone", "Rename this", reacted)] },
-        }],
+        nodes: [
+          {
+            isResolved: false,
+            comments: { nodes: [comment("someone", "Rename this", reacted)] },
+          },
+        ],
       },
     });
   strictEqual(classify(thread(false), VIEWER)?.move, "Reply");
   strictEqual(classify(thread(true), VIEWER), null);
 });
 
-Deno.test("a thumbs-up on the last comment clears Reply, not other moves", () => {
+test("a thumbs-up on the last comment clears Reply, not other moves", () => {
   const reacted = item({
     assignees: { nodes: [{ login: VIEWER }] },
     comments: { nodes: [comment("someone", "Need a decision here", true)] },
@@ -143,14 +146,16 @@ Deno.test("a thumbs-up on the last comment clears Reply, not other moves", () =>
   strictEqual(classify(quiet, VIEWER), null);
 });
 
-Deno.test("bot noise alone is not a ball; a bot reply on my thread is", () => {
+test("bot noise alone is not a ball; a bot reply on my thread is", () => {
   const noise = item({
     comments: {
-      nodes: [{
-        author: { login: "dependabot", __typename: "Bot" },
-        body: "bump foo from 1.0.0 to 1.0.1",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "dependabot", __typename: "Bot" },
+          body: "bump foo from 1.0.0 to 1.0.1",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
     author: { login: VIEWER, __typename: "User" },
   });
@@ -158,18 +163,20 @@ Deno.test("bot noise alone is not a ball; a bot reply on my thread is", () => {
 
   const reply = item({
     comments: {
-      nodes: [{
-        author: { login: "published-bot", __typename: "Bot" },
-        body: "I addressed your comments; ready for another pass",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "published-bot", __typename: "Bot" },
+          body: "I addressed your comments; ready for another pass",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
     author: { login: VIEWER, __typename: "User" },
   });
   strictEqual(classify(reply, VIEWER)?.move, "Reply");
 });
 
-Deno.test("a reply after theirs clears the ball", () => {
+test("a reply after theirs clears the ball", () => {
   const answered = item({
     author: { login: VIEWER, __typename: "User" },
     comments: {
@@ -185,7 +192,7 @@ Deno.test("a reply after theirs clears the ball", () => {
   strictEqual(classify(answered, VIEWER), null);
 });
 
-Deno.test("a question mark inside a URL is not an ask", () => {
+test("a question mark inside a URL is not an ask", () => {
   const link = item({
     author: { login: VIEWER, __typename: "User" },
     comments: {
@@ -197,7 +204,7 @@ Deno.test("a question mark inside a URL is not an ask", () => {
   strictEqual(classify(link, VIEWER), null);
 });
 
-Deno.test("closed, merged, and archived items are skipped", () => {
+test("closed, merged, and archived items are skipped", () => {
   strictEqual(classify(item({ closed: true }), VIEWER), null);
   strictEqual(classify(item({ merged: true }), VIEWER), null);
   strictEqual(
@@ -215,19 +222,21 @@ Deno.test("closed, merged, and archived items are skipped", () => {
   );
 });
 
-Deno.test("an approved green PR authored by me is Merge", () => {
+test("an approved green PR authored by me is Merge", () => {
   const pr = item({
     __typename: "PullRequest",
     author: { login: VIEWER, __typename: "User" },
     mergeable: "MERGEABLE",
     statusCheckRollup: { state: "SUCCESS" },
     reviews: {
-      nodes: [{
-        author: { login: "reviewer", __typename: "User" },
-        body: "LGTM",
-        state: "APPROVED",
-        createdAt: "2026-11-24T00:00:00Z",
-      }],
+      nodes: [
+        {
+          author: { login: "reviewer", __typename: "User" },
+          body: "LGTM",
+          state: "APPROVED",
+          createdAt: "2026-11-24T00:00:00Z",
+        },
+      ],
     },
   });
   strictEqual(classify(pr, VIEWER)?.move, "Merge");

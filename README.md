@@ -25,10 +25,11 @@ npx jsr add @wazoo/workspace
 ## Commands
 
 ```sh
-deno task workspace:validate
-deno task workspace:check
-deno task workspace:install
-deno task workspace:update
+bun install
+bun run workspace:validate
+bun run workspace:check
+bun run workspace:install
+bun run workspace:update
 ```
 
 `wspace init` scaffolds a brand-new workspace in an empty directory;

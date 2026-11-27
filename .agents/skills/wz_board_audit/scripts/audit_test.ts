@@ -1,4 +1,5 @@
 import { match, ok, strictEqual, throws } from "node:assert/strict";
+import { test } from "node:test";
 import { attempt, readAll } from "./paginate.ts";
 import { report } from "./report.ts";
 import type { BoardItem } from "./types.ts";
@@ -27,7 +28,7 @@ function listed(text: string, heading: string): string[] {
   return [...block.matchAll(/\[app#(\d+)\]/g)].map((m) => m[1]);
 }
 
-Deno.test("each check lists exactly its matches, with links", () => {
+test("each check lists exactly its matches, with links", () => {
   const board = [
     item(1),
     item(2, { priority: null }),
@@ -47,24 +48,24 @@ Deno.test("each check lists exactly its matches, with links", () => {
   strictEqual(listed(text, "Check 6").join(), "5");
 });
 
-Deno.test("a failed issue search marks only check 1 as NOT RUN", () => {
+test("a failed issue search marks only check 1 as NOT RUN", () => {
   const text = report(good([item(1)]), bad, NOW);
   match(text, /Check 1: [^\n]+: NOT RUN\nHTTP 502/);
   strictEqual(text.match(/NOT RUN/g)?.length, 1);
 });
 
-Deno.test("a failed board read never reports a check as passed", () => {
+test("a failed board read never reports a check as passed", () => {
   const text = report(bad, good([url(1)]), NOW);
   strictEqual(text.match(/NOT RUN/g)?.length, 7);
   ok(!/: 0$/m.test(text));
 });
 
-Deno.test("hidden board items are called out", () => {
+test("hidden board items are called out", () => {
   const hidden = item(1, { type: "Unreadable", url: null, state: null });
   match(report(good([hidden]), good([]), NOW), /1 items are unreadable/);
 });
 
-Deno.test("a short or broken page sequence throws", () => {
+test("a short or broken page sequence throws", () => {
   const page = { total: 2, hasNext: false, cursor: null, nodes: [1] };
   throws(() => readAll(() => page), /1 of 2/);
   throws(() => readAll(() => ({ ...page, hasNext: true })), /no cursor/);
@@ -72,7 +73,7 @@ Deno.test("a short or broken page sequence throws", () => {
   strictEqual(result.ok, false);
 });
 
-Deno.test("check 4 lists every open In Progress item and its merged fix", () => {
+test("check 4 lists every open In Progress item and its merged fix", () => {
   const board = [
     item(1, { status: "In Progress", mergedFixes: [url(90)] }),
     item(2, { status: "In Progress" }),
@@ -84,7 +85,7 @@ Deno.test("check 4 lists every open In Progress item and its merged fix", () => 
   match(text, /\[app#2\]\([^)]+\): no merged linked fix/);
 });
 
-Deno.test("check 5 lists open P0 and P1 items idle for 14 days or more", () => {
+test("check 5 lists open P0 and P1 items idle for 14 days or more", () => {
   const idle = "2026-01-17T00:00:00Z";
   const board = [
     item(1, { priority: "P0", updatedAt: idle }),

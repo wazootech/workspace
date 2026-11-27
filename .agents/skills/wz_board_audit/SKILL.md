@@ -10,7 +10,7 @@ The script only reads. It writes nothing to GitHub and creates no files.
 ## Run
 
 Needs an authenticated `gh` with access to the org project, and Node 22.18 or
-newer, Bun, or Deno. From the workspace root:
+newer, or Bun. From the workspace root:
 
 ```sh
 node .agents/skills/wz_board_audit/scripts/audit.ts
@@ -41,5 +41,5 @@ An empty list means nothing matched among the repos your token can see.
 ## Test
 
 ```sh
-deno task board:test
+bun run board:test
 ```

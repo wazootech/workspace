@@ -14,9 +14,7 @@ export interface BoardItem {
 }
 
 /** A read that either finished completely or says why it did not. */
-export type Fetched<T> =
-  | { ok: true; value: T }
-  | { ok: false; reason: string };
+export type Fetched<T> = { ok: true; value: T } | { ok: false; reason: string };
 
 export interface Page<T> {
   total: number;
