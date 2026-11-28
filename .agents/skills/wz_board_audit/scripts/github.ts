@@ -1,10 +1,10 @@
-/** GitHub reads for the board audit, through the `gh` CLI. Never writes. */
+/** GitHub reads for the board scripts, through the `gh` CLI. Never writes. */
 import { execFileSync } from "node:child_process";
 import { readAll } from "./paginate.ts";
 import { BOARD_QUERY, OPEN_ISSUES_QUERY } from "./query.ts";
 import type { BoardItem, Page } from "./types.ts";
 
-const PROJECT_ID = "PVT_kwDOC8Sdbc4BpyaL";
+export const PROJECT_ID = "PVT_kwDOC8Sdbc4BpyaL";
 const SEARCH = "org:wazootech is:issue is:open archived:false";
 
 interface Connection<N> {
@@ -30,7 +30,10 @@ interface Content {
 }
 
 /** Retries because large GraphQL reads sometimes fail with HTTP 502. */
-function graphql(query: string, variables: Record<string, string>): unknown {
+export function graphql(
+  query: string,
+  variables: Record<string, string>,
+): unknown {
   const args = ["api", "graphql", "-f", `query=${query}`];
   for (const [key, value] of Object.entries(variables)) {
     args.push("-f", `${key}=${value}`);

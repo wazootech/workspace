@@ -13,6 +13,7 @@
     "balls:collect": "bun .agents/skills/balls/scripts/collect.ts",
     "balls:test": "bun test ./.agents/skills/balls/scripts",
     "board:audit": "bun .agents/skills/wz_board_audit/scripts/audit.ts",
+    "board:edit": "bun .agents/skills/wz_board_audit/scripts/edit.ts",
     "board:test": "bun test ./.agents/skills/wz_board_audit/scripts",
     "fmt": "bun fmt --no-script",
     "fmt:check": "bun fmt --no-script --check",
