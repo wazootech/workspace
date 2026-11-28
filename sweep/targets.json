@@ -19,7 +19,7 @@
     {
       "repo": "wazoo.dev",
       "paths": ["scripts/"],
-      "scripts": ["scripts/build.ts"]
+      "scripts": ["scripts/generate.ts"]
     },
     { "repo": "agents-md", "scripts": ["scripts/build.ts"] },
     { "repo": "kgc-demo", "scripts": ["src/demo.ts"] },
@@ -48,5 +48,8 @@
     "@wazoo/workspace",
     "@wazoo/wiki"
   ],
-  "bins": { "@wazoo/workspace": "wspace", "@wazoo/wiki": "wiki" }
+  "bins": {
+    "@wazoo/workspace": "src/cli.js",
+    "@wazoo/wiki": "src/wiki/cli.js"
+  }
 }

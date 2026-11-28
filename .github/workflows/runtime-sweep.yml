@@ -39,6 +39,7 @@ jobs:
           ref: ${{ steps.target.outputs.ref }}
           path: target
           persist-credentials: false
+          submodules: recursive
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: "1.x"
@@ -79,7 +80,8 @@ jobs:
         with:
           deno-version: v2.9.8
       - run: bun sweep/published.ts ${{ matrix.runtime }} published-${{ matrix.runtime }}-${{ matrix.os }}
+      - run: bun sweep/npm.ts ${{ matrix.runtime }} published-${{ matrix.runtime }}-${{ matrix.os }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: published-${{ matrix.runtime }}-${{ matrix.os }}
-          path: published-${{ matrix.runtime }}-${{ matrix.os }}.json
+          path: "*published-${{ matrix.runtime }}-${{ matrix.os }}.json"

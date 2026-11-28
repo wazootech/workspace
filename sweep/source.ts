@@ -1,9 +1,11 @@
 // Runs one repository's test files and scripts under Bun, Node and Deno.
 //   bun sweep/source.ts <repo> <checkout> <result.json>
-import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { cause, run } from "./run.ts";
+import { runScripts } from "./scripts.ts";
 
 type Target = {
   repo: string;
@@ -27,23 +29,33 @@ const files = run(["git", "ls-files"], dir)
     (f) => TEST.test(f) && (target.paths ?? [""]).some((p) => f.startsWith(p)),
   );
 
-const DENO = [
-  "deno",
-  "test",
-  "--allow-all",
-  "--no-check",
-  "--node-modules-dir=manual",
-];
+// Used by the assisted Deno pass only.
+const map = join(tmpdir(), "sweep-import-map.json");
+const src = `${pathToFileURL(resolve(dir, "src")).href}/`;
+writeFileSync(map, JSON.stringify({ imports: { "@/": src } }));
+
+const NODE = ["node", "--test", "--test-reporter=tap", "--test-timeout=120000"];
+const DENO = ["deno", "test", "--allow-all", "--no-check"];
+const MANUAL = "--node-modules-dir=manual";
+const HOOK = new URL("./alias.mjs", import.meta.url).href;
 const COMMANDS: Record<string, (file: string) => string[]> = {
   bun: (f) => ["bun", "test", "--timeout", "120000", `./${f}`],
-  node: (f) => [
+  node: (f) => [...NODE, f],
+  deno: (f) => [...DENO, MANUAL, f],
+  "node-assisted": (f) => [
     "node",
-    "--test",
-    "--test-reporter=tap",
-    "--test-timeout=120000",
+    "--experimental-transform-types",
+    `--import=${HOOK}`,
+    ...NODE.slice(1),
     f,
   ],
-  deno: (f) => [...DENO, f],
+  "deno-assisted": (f) => [
+    ...DENO,
+    MANUAL,
+    "--sloppy-imports",
+    `--import-map=${map}`,
+    f,
+  ],
 };
 
 function count(runtime: string, out: string, word: "pass" | "fail"): number {
@@ -51,7 +63,7 @@ function count(runtime: string, out: string, word: "pass" | "fail"): number {
     bun: new RegExp(`^\\s*(\\d+) ${word}$`, "m"),
     node: new RegExp(`^# ${word} (\\d+)$`, "m"),
     deno: new RegExp(`\\| (\\d+) ${word === "pass" ? "passed" : "failed"}`),
-  }[runtime];
+  }[runtime.replace("-assisted", "")];
   return Number(pattern?.exec(out)?.[1] ?? 0);
 }
 
@@ -70,45 +82,7 @@ const tests = Object.entries(COMMANDS).map(([runtime, command]) => {
   return { runtime, results };
 });
 
-const SCRIPT: Record<string, string[]> = {
-  bun: ["bun"],
-  node: ["node"],
-  deno: ["deno", "run", "--allow-all", "--node-modules-dir=manual"],
-};
-const scripts = (target.scripts ?? []).flatMap((script) =>
-  Object.entries(SCRIPT).map(([runtime, command]) => {
-    run(["git", "clean", "-qfdx", "-e", "node_modules"], dir);
-    const r = run([...command, script], dir);
-    if (r.code)
-      console.log(
-        `::group::${runtime} ${script}\n${r.out.slice(-4000)}\n::endgroup::`,
-      );
-    // Hash what the script wrote, so runtimes can be compared.
-    const written = run(
-      ["git", "status", "--porcelain", "--ignored", "-uall", "."],
-      dir,
-    )
-      .out.split("\n")
-      .map((l) => l.slice(3).trim())
-      .filter((f) => f && !f.includes("node_modules"))
-      .toSorted();
-    const hash = createHash("sha256");
-    for (const f of written)
-      hash.update(f).update(run(["git", "hash-object", f], checkout).out);
-    const printed = createHash("sha256")
-      .update(r.stdout.replaceAll("\r", ""))
-      .digest("hex");
-    const digest = `${written.length} files ${hash.digest("hex").slice(0, 10)}, stdout ${printed.slice(0, 10)}`;
-    return {
-      script,
-      runtime,
-      ok: r.code === 0,
-      digest,
-      error: r.code ? cause(r.out) : undefined,
-    };
-  }),
-);
-
+const scripts = runScripts(target.scripts ?? [], dir, checkout);
 const sha = run(["git", "rev-parse", "--short", "HEAD"], checkout).out.trim();
 writeFileSync(
   output,

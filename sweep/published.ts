@@ -1,8 +1,8 @@
 // Installs the latest JSR release of each package into a fresh project and
 // imports every export under one runtime.  bun sweep/published.ts <runtime> <label>
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { checkCommands } from "./commands.ts";
+import { consumer } from "./consumer.ts";
 import { cause, run } from "./run.ts";
 
 const [runtime, label] = process.argv.slice(2);
@@ -27,42 +27,19 @@ for (const name of targets.packages as string[]) {
   const published = items
     .find((v) => v.version === version)
     ?.createdAt.slice(0, 10);
-  const dir = mkdtempSync(join(tmpdir(), "sweep-"));
-  const write = (file: string, text: string) =>
-    writeFileSync(join(dir, file), text);
-  let install: string | undefined;
-  if (runtime !== "deno") {
-    write("package.json", '{"name":"consumer","private":true,"type":"module"}');
-    write(".npmrc", "@jsr:registry=https://npm.jsr.io\n");
-    const spec = `${name}@npm:@jsr/${scope}__${short}@${version}`;
-    const r =
-      runtime === "bun"
-        ? run(["bun", "add", "--minimum-release-age", "0", spec], dir)
-        : run(["npm", "install", "--no-audit", "--no-fund", spec], dir);
-    if (r.code) install = cause(r.out);
-    if (!install && runtime.startsWith("node")) {
-      run(
-        [
-          "npm",
-          "install",
-          "--no-audit",
-          "--no-fund",
-          "typescript@5",
-          "@types/node@24",
-        ],
-        dir,
-      );
-    }
-  }
+  const spec = `${name}@npm:@jsr/${scope}__${short}@${version}`;
+  const { dir, write, install } = consumer(runtime, spec);
   const exports = Object.keys(meta.exports as Record<string, string>).map(
     (key, i) => {
       if (install) return { key, load: install };
       const base = runtime === "deno" ? `jsr:${name}@${version}` : name;
-      const spec = base + (key === "." ? "" : key.slice(1));
+      const from = base + (key === "." ? "" : key.slice(1));
+      const json = key.endsWith(".json");
+      const options = json ? ', { with: { type: "json" } }' : "";
       const file = `load${i}.mjs`;
       write(
         file,
-        `const m = await import("${spec}");\nconsole.log("NAMES " + Object.keys(m).sort());\n`,
+        `const m = await import("${from}"${options});\nconsole.log("NAMES " + Object.keys(m).sort());\n`,
       );
       const loaded =
         runtime === "deno"
@@ -70,13 +47,16 @@ for (const name of targets.packages as string[]) {
           : run([runtime === "bun" ? "bun" : "node", file], dir);
       const names = /^NAMES (.*)$/m.exec(loaded.out)?.[1];
       const typed = `types${i}.ts`;
-      write(typed, `import * as m from "${spec}";\nexport default m;\n`);
+      const statement = json
+        ? `import m from "${from}" with { type: "json" };`
+        : `import * as m from "${from}";`;
+      write(typed, `${statement}\nexport default m;\n`);
       let check;
       if (runtime === "deno")
         check = run(["deno", "check", "--no-config", AGE, typed], dir);
       if (runtime.startsWith("node")) {
         const flags =
-          "--noEmit --strict --skipLibCheck --module nodenext --target es2022";
+          "--noEmit --strict --skipLibCheck --module nodenext --target es2022 --resolveJsonModule";
         check = run(
           ["npx", "tsc", ...flags.split(" "), "--types", "node", typed],
           dir,
@@ -90,31 +70,17 @@ for (const name of targets.packages as string[]) {
       };
     },
   );
-  let bin: string | undefined;
-  const command: string | undefined = targets.bins[name];
-  if (command && !install) {
-    const argv =
-      runtime === "deno"
-        ? [
-            "deno",
-            "run",
-            "--no-config",
-            AGE,
-            "--allow-all",
-            `jsr:${name}@${version}/cli`,
-          ]
-        : runtime === "bun"
-          ? ["bun", "run", command]
-          : ["npx", "--no-install", command];
-    const r = run([...argv, "--help"], dir, 120_000);
-    bin = r.code ? cause(r.out) : "ok";
-  }
+  const path: string | undefined = targets.bins[name];
+  const commands =
+    path && !install
+      ? checkCommands(runtime, `jsr:${name}@${version}/cli`, name, path, dir)
+      : undefined;
   console.log(
     name,
     version,
     JSON.stringify(exports.map((e) => [e.key, e.load, e.types])),
-    bin ?? "",
+    JSON.stringify(commands ?? ""),
   );
-  packages.push({ name, version, published, exports, bin });
+  packages.push({ name, version, published, exports, commands });
 }
 writeFileSync(`${label}.json`, JSON.stringify({ label, packages }));
