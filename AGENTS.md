@@ -64,7 +64,7 @@ create a worktree first — regardless of what the child repo's docs say.
 ### Big Picture board edits
 
 Change board item fields only with `bun run board:edit` (see
-[`wz_board_audit`](.agents/skills/wz_board_audit/SKILL.md#edit-an-item)). Never
+[`board`](.agents/skills/board/SKILL.md#edit-an-item)). Never
 edit an open item marked Done any other way, not even another field: the board
 can close its issue. Mark an item Done by closing its issue, and only when the
 issue is ready to close.
@@ -75,7 +75,8 @@ Agent-facing files across the family fall under one membership test with three
 answers:
 
 1. **Workspace-development skills** — developed here, for here. They live in
-   root `.agents/skills/`, carry the `wz_` prefix, and may couple to harness
+   root `.agents/skills/` under bare names, like
+   [`balls`](.agents/skills/balls/SKILL.md), and may couple to harness
    artifacts (`workspace.json`, board IDs). Codex and OpenCode discover this
    path natively. Claude Code does not: `.claude/skills/<name>` is a committed
    symlink to the canonical directory, so there is one source of truth. Fresh
@@ -93,12 +94,8 @@ answers:
 
 Placement outcomes: ambient rules live in AGENTS.md (this constitution for the
 family, each repo's manual for repo specifics); procedures live in SKILL.md
-files. Mechanical rules: skill files are named `SKILL.md` (exact casing); a
-skill's frontmatter `name:` equals its directory name; a directory directly
-under root `.agents/skills/` without the `wz_` prefix fails, as does a `wz_`
-name anywhere outside `.agents/skills/` (except the `.claude/skills/` symlink
-that points into it). The `balls` skill is a one-off prefix-less exception:
-OpenCode, Codex, and Claude Code load it as-is. Wiki-template payloads
+files. Mechanical rules: skill files are named `SKILL.md` (exact casing), and a
+skill's frontmatter `name:` equals its directory name. Wiki-template payloads
 (`repos/wiki-templates/templates/*/AGENTS.md`) — shipped content that doubles as
 live instructions in scaffolded sites — must carry their `template-payload`
 header.
