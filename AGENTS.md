@@ -61,6 +61,14 @@ create a worktree first — regardless of what the child repo's docs say.
   rather than a full one. Say so where the install is documented instead of
   letting it fail one repo at a time.
 
+### Big Picture board edits
+
+Change board item fields only with `bun run board:edit` (see
+[`wz_board_audit`](.agents/skills/wz_board_audit/SKILL.md#edit-an-item)). Never
+edit an open item marked Done any other way, not even another field: the board
+can close its issue. Mark an item Done by closing its issue, and only when the
+issue is ready to close.
+
 ### Agent-file classes
 
 Agent-facing files across the family fall under one membership test with three
