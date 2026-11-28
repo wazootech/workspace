@@ -34,7 +34,7 @@ since the last run.
 
 Check 4 sees only pull requests GitHub links as closing an issue, and a merged
 fix does not show that production runs it. Never set Status to Done from this
-list: the board closes an issue that is marked Done. Check 5 counts the days
+list: the board may close an issue that is marked Done. Check 5 counts the days
 since the issue or pull request was last updated.
 
 An empty list means nothing matched among the repos your token can see.
@@ -42,8 +42,8 @@ An empty list means nothing matched among the repos your token can see.
 ## Edit an item
 
 Mark an item Done only when its issue is ready to close, and do that by closing
-the issue: the board then sets Done. The board's Auto-close workflow closes an
-issue marked Done, and editing another field of an open Done item has closed it
+the issue: the board then sets Done. The board's Auto-close workflow can close
+an issue marked Done, and editing another field of an open Done item has closed it
 too. Change board fields only with this script, from the workspace root:
 
 ```sh

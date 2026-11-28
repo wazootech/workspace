@@ -84,6 +84,17 @@ test("a failed or overwritten write is not reported as done", async () => {
   );
 });
 
+test("an unreadable result says the item needs checking", async () => {
+  const { io, log } = board(item("OPEN", "Todo"), item("OPEN", "Todo"));
+  const read = io.read;
+  io.read = () => {
+    if (log.includes("write")) throw new Error("HTTP 502");
+    return read();
+  };
+  const changes = parseChanges(["Priority=P2"]);
+  await rejects(apply(changes, io), /cannot read the item. Check it: HTTP 502/);
+});
+
 test("changes must be well formed and name each field once", () => {
   throws(() => parseChanges([]), /at least one change/);
   throws(() => parseChanges(["Status"]), /expected Field=Value/);

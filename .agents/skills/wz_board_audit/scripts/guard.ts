@@ -38,7 +38,7 @@ export function refusal(item: Item, changes: Change[]): string | null {
   if (item.state !== "OPEN") return null;
   const status = changes.find((change) => change.field === "Status");
   if (status?.value === "Done") {
-    return "marking an open item Done closes its issue; close the issue instead";
+    return "marking an open item Done can close its issue; close the issue instead";
   }
   if (item.values.Status !== "Done") return null;
   if (status && changes.length === 1) return null;
@@ -49,6 +49,18 @@ export function refusal(item: Item, changes: Change[]): string | null {
 }
 
 const shown = (value: string | null | undefined) => value ?? "(none)";
+
+/** The item after a write, saying plainly when it cannot be read. */
+function readBack(io: BoardIo): Item {
+  try {
+    return io.read();
+  } catch (error) {
+    const why = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `tried to write, but cannot read the item. Check it: ${why}`,
+    );
+  }
+}
 
 /** Makes the changes, then confirms the issue kept its state. */
 export async function apply(changes: Change[], io: BoardIo): Promise<string> {
@@ -64,7 +76,7 @@ export async function apply(changes: Change[], io: BoardIo): Promise<string> {
   }
   // A failed write may have landed in part, so the state is checked either way.
   await io.settle();
-  const after = io.read();
+  const after = readBack(io);
   if (after.state !== before.state) {
     throw new Error(
       `THE ISSUE CHANGED STATE: ${before.state} -> ${after.state}. Check it now.`,
