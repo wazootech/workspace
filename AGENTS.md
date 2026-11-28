@@ -64,7 +64,7 @@ create a worktree first — regardless of what the child repo's docs say.
 ### Big Picture board edits
 
 Change board item fields only with `bun run board:edit` (see
-[`board-audit`](.agents/skills/board-audit/SKILL.md#edit-an-item)). Never
+[`board`](.agents/skills/board/SKILL.md#edit-an-item)). Never
 edit an open item marked Done any other way, not even another field: the board
 can close its issue. Mark an item Done by closing its issue, and only when the
 issue is ready to close.
