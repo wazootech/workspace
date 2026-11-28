@@ -246,6 +246,11 @@ review discipline.
   identifier lists its downstream dependents, the merge order, and what could
   not be observed (see Cross-repo changes). Coverage floors only rise: raise
   them in the PR that earns it, never lower one without a named exemption.
+- **PR bodies.** Follow the
+  [org PR template](https://github.com/wazootech/.github/blob/main/.github/PULL_REQUEST_TEMPLATE.md),
+  or the repo's own where it has one. `gh pr create --body` skips the template,
+  so read it and fill in its sections yourself. Review your own diff and
+  description before asking anyone else to.
 - **Ownership.** Every repo has `.github/CODEOWNERS` and a README with its
   owner, purpose, and the one command that sets up, builds, and tests it.
 
