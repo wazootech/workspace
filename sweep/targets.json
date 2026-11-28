@@ -1,0 +1,52 @@
+{
+  "source": [
+    { "repo": "worlds-sdk-ts" },
+    { "repo": "sparql-engine" },
+    { "repo": "reasoner", "paths": ["test/unit/"] },
+    { "repo": "worlds-client-ts", "paths": ["test/"] },
+    { "repo": "wazoo-client-ts" },
+    { "repo": "linked-markdown-ts" },
+    { "repo": "worlds-sqlite" },
+    { "repo": "worlds-libsql" },
+    { "repo": "worlds-postgres" },
+    { "repo": "worlds-indexeddb" },
+    { "repo": "worlds-cloudflare" },
+    { "repo": "worlds-kit", "paths": ["tests/"] },
+    { "repo": "wazoo-tools" },
+    { "repo": "workspace-cli" },
+    { "repo": "wiki", "paths": ["tests/"] },
+    { "repo": "wazoo-twins" },
+    {
+      "repo": "wazoo.dev",
+      "paths": ["scripts/"],
+      "scripts": ["scripts/build.ts"]
+    },
+    { "repo": "agents-md", "scripts": ["scripts/build.ts"] },
+    { "repo": "kgc-demo", "scripts": ["src/demo.ts"] },
+    { "repo": "workspace", "paths": [".agents/skills/"] },
+    {
+      "repo": "wiki-templates",
+      "ref": "refs/pull/78/head",
+      "dir": "templates/wikipedia",
+      "scripts": ["build.ts"]
+    }
+  ],
+  "packages": [
+    "@worlds/sdk",
+    "@worlds/client",
+    "@worlds/sqlite",
+    "@worlds/libsql",
+    "@worlds/postgres",
+    "@worlds/indexeddb",
+    "@worlds/cloudflare",
+    "@worlds/kit",
+    "@wazoo/sparql-engine",
+    "@wazoo/reasoner",
+    "@wazoo/client",
+    "@wazoo/linked-markdown",
+    "@wazoo/tools",
+    "@wazoo/workspace",
+    "@wazoo/wiki"
+  ],
+  "bins": { "@wazoo/workspace": "wspace", "@wazoo/wiki": "wiki" }
+}
