@@ -1,5 +1,5 @@
 ---
-name: wz_board_audit
+name: board-audit
 description: Lists where the Wazoo Platform Big Picture board disagrees with GitHub — open issues missing from the board, items with no Priority, closed issues not marked Done, open issues marked Done, In Progress items with merged fixes, and stale P0/P1 items. Use when asked to audit, check, or reconcile the board, to verify a triage run's report, or before changing any field of a board item.
 ---
 
@@ -14,7 +14,7 @@ Needs an authenticated `gh` with access to the org project, and Node 22.18 or
 newer, or Bun. From the workspace root:
 
 ```sh
-node .agents/skills/wz_board_audit/scripts/audit.ts
+node .agents/skills/board-audit/scripts/audit.ts
 ```
 
 ## Read the output
