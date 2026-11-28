@@ -46,6 +46,30 @@ not mention worktrees, the hard boundary in this file (below) is in effect. If
 your cwd is inside `repos/<repo>/` and you need to make code changes, stop and
 create a worktree first — regardless of what the child repo's docs say.
 
+## Repository lanes
+
+Three repositories describe the company. Each fact has one owner; the others
+link to it and do not restate its rule.
+
+| Repository           | Question it answers            | Owns                                                                                | Keeps out                            |
+| -------------------- | ------------------------------ | ----------------------------------------------------------------------------------- | ------------------------------------ |
+| `workspace` (public) | How do I work here?            | Rules agents follow: worktrees, checks, merge authority, releases, skills, manifest | Company background, decision history |
+| `company` (public)   | Who are we, and how do I join? | Roster, charters, onboarding, people norms                                          | Tooling, environments, deploy detail |
+| `memory` (private)   | What do we know, and why?      | Decisions, positioning, dependency shape, vault layout                              | Step-by-step rules, work status      |
+
+Anything about a single product stays in that product's repository. To place
+something new, take the first line that applies:
+
+1. Could it expose something sensitive? `memory`, or a private repository for
+   secrets-adjacent material.
+2. Would an agent do the wrong thing without it? Here, or that repository's
+   `AGENTS.md`.
+3. Does a newcomer need it to find their place? `company`.
+4. Is it a lasting decision or fact with a reason? `memory`.
+
+A pull request that renames or moves something searches the organization for the
+old name.
+
 ## Core rules
 
 ### Manifest membership
@@ -192,8 +216,17 @@ checkout, it must create and enter a worktree before editing.
 
 ### Judgment and escalation
 
-Default to action for in-scope, reversible work, including merging and
-deploying. Pause and ask when an action is irreversible or high-risk:
+Default to action for in-scope, reversible work. This is the family's merge
+rule:
+
+- An agent may merge a pull request when the change is in scope and reversible,
+  and merging it neither deploys to production nor publishes a package. The pull
+  request's **Merging this** line says which.
+- A person merges the rest, unless they ask the agent for that merge. Open the
+  pull request, run the gates, and say it is waiting.
+- An agent's own charter may be narrower.
+
+Pause and ask when an action is irreversible or high-risk:
 
 - Creating or deleting repositories or manifest entries.
 - Force-pushing or resetting a shared branch.
